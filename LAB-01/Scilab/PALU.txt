@@ -1,0 +1,34 @@
+// Programa para descomponer una matriz cuadrada en los factores PALU
+// Entrada: Matriz cuadrada NxN 
+// Salida:  Factores P (matriz de permutación), L (matriz triangular inferior)
+//                   U (Matriz triangular superior)
+function [P,L,U] = factorLUpivotparcial(A)
+ 
+[n,m] = size(A);
+if(m~=n)
+    error('La Matriz A no es cuadrada');
+    return;
+end
+
+  L = eye(n,n);
+  P = eye(n,n);
+  U = A;
+    for j=1:n-1
+    [ma,k] = max(abs(U(j:n,j)));
+    k = k+j-1;
+    faux = U(j,:);
+    U(j,:) = U(k,:);
+    U(k,:) = faux;
+    paux = P(j,:);
+    P(j,:) = P(k,:);
+    P(k,:) = paux;
+    laux = L(j,1:j-1);
+    L(j,1:j-1) = L(k,1:j-1);
+    L(k,1:j-1) = laux;
+      for i=j+1:n
+        L(i,j) = U(i,j)/U(j,j);
+        U(i,j+1:n) = U(i,j+1:n) - L(i,j)*U(j,j+1:n);
+        U(i,j) = 0;
+      end
+    end
+ endfunction  

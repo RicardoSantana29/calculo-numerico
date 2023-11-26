@@ -1,0 +1,34 @@
+// Programa para descomponer una matriz real, simétrica y definida positiva en  
+// la forma de Cholesky
+
+function [L,U] = cholesky1(A)
+  [n,m] = size(A);
+  U = [];
+ // prueba para determinar si la matriz es cuadrada
+  if (m~=n)
+   disp('La matriz A no es cuadrada');
+  return
+end
+// prueba para verificar si la matriz es simétrica
+     [cantidad,posicion]=find(A==A');
+     if (length(cantidad)~= (n*m))
+      disp('La matriz A no es simetrica');
+     return
+   end 
+// prueba para determinar si la matriz es definida positiva   
+       av = spec(A);
+       if (sum(av > 0)~=n)
+         disp('La matriz A no es definida positiva');
+       return
+       else
+         [U] = triu(A);
+       end
+  
+  for k=1:m
+    for j=k+1:m
+      U(j,j:m) = U(j,j:m) - U(k,j:m)*(U(k,j)/U(k,k));
+    end
+    U(k,k:m) = U(k,k:m)/sqrt(U(k,k));
+  end
+  L = U';
+endfunction

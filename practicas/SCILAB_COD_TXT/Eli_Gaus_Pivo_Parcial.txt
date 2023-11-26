@@ -1,0 +1,43 @@
+// Programa para resolver sistema de ecuaciones lineales aplicando
+// el método de eliminación Gaussiana con pivote parcial.
+// Entradas:   Matriz cuadrada (NxN) de rango N (sistema compatible determinado)
+//             Vector colummna independiente 
+// Salida:     Vector solución del sistema.
+function [sol] = Eli_Gaus_Pivo_Parcial(A,b)
+[n,m] = size(A);
+r = rank(A);
+if(m~=n)
+    error('La Matriz A no es cuadrada');
+    return;
+end
+if (n~=r)
+    error('Sistema no compatible determinado');
+    return;
+end
+[n1,m1] = size(b);
+if(n1~=n || m1~=1)
+    error('Medida del vector independiente no valida');
+    return;
+end
+for j=1:n-1
+    [ma,k] = max(abs(A(j:n,j)));
+    k = k+j-1;
+    faux = A(j,:);
+    A(j,:) = A(k,:);
+    A(k,:) = faux;
+    baux = b(j);
+    b(j) = b(k);
+    b(k) = baux;
+    for i=j+1:n
+        mu = A(i,j)/A(j,j);
+        A(i,:) = A(i,:) - mu*A(j,:);
+        b(i) = b(i) - mu*b(j);
+    end
+end
+//Sustitución hacia atrás
+sol = zeros(n,1);
+sol(n) = b(n)/A(n,n);
+for k=n-1:-1:1
+    sol(k) = (b(k) - sum(A(k,k+1:n).*sol(k+1:n)'))/A(k,k);
+end
+endfunction
