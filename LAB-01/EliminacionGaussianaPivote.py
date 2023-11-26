@@ -7,7 +7,7 @@ def EliminacionGaussianaPivoteParcial(A,b):
     if (m!=n):
         print('La matriz no es cuadrada')
         return
-
+    
     (n1,m1) = b.shape
     if (n1!=n or m1!=1):
         print('Medida del vector independiente no valida')
@@ -35,8 +35,3 @@ def EliminacionGaussianaPivoteParcial(A,b):
     sol = sus_reg(A, b)
         
     return sol
-    
-A = np.array([[1,0,0],[-0.5,1,0],[0.5,-0.2,1]],dtype='f')
-b = np.array([[2],[-12],[4]], dtype='f')
-
-print(sus_pro(A, b)) 
