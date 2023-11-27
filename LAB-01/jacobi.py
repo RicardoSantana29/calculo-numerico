@@ -15,14 +15,12 @@ def jacobi(x0, A, b, maxit, tol):
     
     if np.linalg.matrix_rank(A) != n or np.linalg.matrix_rank(A) != m:
         return 'Sistema incompatible'
-    
+
     D = np.diag(np.diagonal(A))
     Al = -np.tril(A)
     Au = -np.triu(A)
-    print(D,'---',Al,'---',Au)
     M = np.matmul(np.linalg.inv(D), (Al + Au))
     radio_espectral_M = np.max(np.abs(np.linalg.eigvals(M)))
-    print(np.linalg.eigvals(M))
     if radio_espectral_M >= 1:
         return 'El metodo no converge'
     
