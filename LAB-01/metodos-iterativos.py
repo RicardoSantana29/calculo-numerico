@@ -3,12 +3,33 @@ import sys
 import pandas as pd
 
 class SEL():
-    def __init__(self,A,b):
+    def __init__(self, A, b):
         self.A = np.array(A, dtype='f')
-        self.b = np.array(b, dtype='f')
-        #self.D = np.diag(np.diagonal(A))
-        #self.Al = np.tril(A)*(-1)
-        #self.Au = np.triu(A)*(-1)
+        self.b = np.reshape(np.array(b, dtype='f'), (len(b),1))
+        self.x0 = np.zeros_like(b, dtype='f') #por defecto [[0], [0], [0],...]
+        self.D = np.diag(np.diagonal(A))
+        self.Al = -np.tril(A, -1)
+        self.Au = -np.triu(A, 1)
+
+    #menu de metodos directos
+    def metodo_directo(self,nombre):
+        nombre = nombre.lower()
+        if nombre == 'gauss':
+            return self.resolucion_gaussiana()
+        elif nombre == 'palu':
+            return self.resolucion_palu()
+        elif nombre == 'cholesky':
+            return self.resolucion_cholesky()
+
+    #menu de metodos iterativos
+    def metodo_iterativo(self,nombre):
+        nombre = nombre.lower()
+        if nombre == 'jacobi':
+            return self.resolucion_jacobi()
+        elif nombre == 'seidel':
+            return self.resolucion_seidel()
+        elif nombre == 'sor':
+            return self.resolucion_sor()
 
     #herramientas
     def sustitucion_progresiva(self,triangular_inferior,vector):
@@ -29,6 +50,26 @@ class SEL():
             sol[kk] = (vector[kk] - sum(triangular_superior[kk,kk+1:n]*sol[kk+1:n]).T)/triangular_superior[kk,kk]
         
         return sol
+
+    def verificacion_iterativa(self):
+        n, m = A.shape
+        if m != n:
+            return 'La Matriz A no es cuadrada'
+        
+        n1, m1 = b.shape
+        if n1 != n or m1 != 1:
+            return 'Medida del vector independiente no valida'
+        
+        n1, m1 = self.x0.shape
+        if n1 != n or m1 != 1:
+            return 'Medida del iterado inicial no valida'
+        
+        if np.linalg.matrix_rank(self.A) != n or np.linalg.matrix_rank(self.A) != m:
+            return 'Sistema incompatible'
+        
+        return True
+
+    #-----metodos directos-----
 
     #metodo de eliminacion gaussiana por pivoto parcial
     def resolucion_gaussiana(self):
@@ -165,29 +206,126 @@ class SEL():
         x = self.sustitucion_regresiva(Lt, y)
         return x
 
-    #menu de metodos directos
-    def metodo_directo(self,nombre):
-        if nombre == 'gauss':
-            return self.resolucion_gaussiana()
-        elif nombre == 'palu':
-            return self.resolucion_palu()
-        elif nombre == 'cholesky':
-            return self.resolucion_cholesky()
+    #-----metodos iterativos-----
+
+    #metodo de jacobi
+    def resolucion_jacobi(self, max_iteraciones, tolerancia):
+
+        if self.verificacion_iterativa() != True:
+            return self.verificacion_iterativa()
+
+        M = np.matmul(np.linalg.inv(self.D), (self.Al + self.Au))
+
+        rho = np.max(np.abs(np.linalg.eigvals(M)))
+        if rho >= 1:
+            return 'El metodo no converge'
+
+        v = np.matmul((np.linalg.inv(self.D)), self.b)
+        xk = self.x0
+        rk = np.matmul(self.A, xk) - self.b
+        Nrk = np.linalg.norm(rk, 1)
+        k = 0
+        res = np.array([k, Nrk])
+        
+        while True:
+            if Nrk <= tolerancia:
+                return xk, res
+            if k > max_iteraciones:
+                return xk, res
+            
+            res = np.append(res, Nrk)
+            xk = np.matmul(M, xk) + v
+            rk = np.matmul(self.A, xk) - self.b
+            Nrk = np.linalg.norm(rk, 1)
+            k += 1
+
+    #metodo de GaussSeidel
+    def resolucion_seidel(self, max_iteraciones, tolerancia):
+        if self.verificacion_iterativa() != True:
+            return self.verificacion_iterativa()
+
+        inv_D_Al = np.linalg.inv(self.D - self.Al)
+        M = np.matmul(inv_D_Al, self.Au)
+
+        rho = np.max(np.abs(np.linalg.eigvals(M)))
+        if rho >= 1:
+            return 'El metodo no converge'
+
+        v = np.matmul(inv_D_Al, self.b)
+        xk = self.x0
+        rk = np.matmul(self.A, xk) - self.b
+        Nrk = np.linalg.norm(rk, 1)
+        k = 0
+        res = np.array([k, Nrk])
+
+        while True:
+            if Nrk <= tolerancia:
+                return xk, res
+            if k > max_iteraciones:
+                return xk, res
+
+            res = np.append(res, [Nrk], axis=0)
+            xk = np.matmul(M, xk) + v
+            rk = np.matmul(self.A, xk) - self.b
+            Nrk = np.linalg.norm(rk, 1)
+            k += 1
+
+    #metodo SOR
+    def resolucion_sor(self, max_iteraciones, tolerancia, omega):
+        if self.verificacion_iterativa() != True:
+            return self.verificacion_iterativa()
+
+        w = omega
+        Inv_D_wAl = np.linalg.inv(self.D - w * self.Al)
+        M = np.matmul(Inv_D_wAl, (w * self.Au + (1 - w) * self.D))
+        
+        rho = np.max(np.abs(np.linalg.eigvals(M)))
+        if rho >= 1:
+            return 'El metodo no converge'
+
+        v = np.matmul(Inv_D_wAl, w * self.b)
+        xk = self.x0
+        rk = np.matmul(self.A, xk) - self.b
+        Nrk = np.linalg.norm(rk, 1)
+        k = 0
+        res = np.array([k, Nrk])
+
+        while True:
+            if Nrk <= tolerancia:
+                return xk, res
+            if k > max_iteraciones:
+                return xk, res
+
+            res = np.append(res, [Nrk], axis=0)
+            xk = np.matmul(M, xk) + v
+            rk = np.matmul(self.A, xk) - self.b
+            Nrk = np.linalg.norm(rk, 1)
+            k += 1
 
 #A = np.array([[1,2,4],[2,9,7],[-1,8,-2]],dtype='f')
 #A = np.array([[4,1,-1,0],[1,3,-1,0],[-1,-1,5,2],[0,0,2,4]],dtype='f')
 #b = np.array([[4],[2],[-12]], dtype='f')
 
+#x0=np.array([[-1],[5],[3],[2]],dtype='f')
+#A=np.array([[5,-1,1,1],[1,4,0,1],[3,-1,6,0],[0,1,-1,3]],dtype='f')
+#b=np.array([[5],[2],[-3],[4]],dtype='f')
+itera=100
+tol=0.0000001
+
 ruta_carpeta = sys.path[0]
 
-A = np.loadtxt(f'{ruta_carpeta}/Apr.txt',skiprows = 0, delimiter=',')
-b = np.loadtxt(f'{ruta_carpeta}/bpr.txt',skiprows = 0, delimiter=',')
-np.reshape(b, (len(b),1))
+A = pd.read_csv(f'{ruta_carpeta}/Apr.csv', header=None, delimiter=';')
+b = pd.read_csv(f'{ruta_carpeta}/bpr.csv', header=None, delimiter=';')
+
+#A = np.loadtxt(f'{ruta_carpeta}/Apr.txt',skiprows = 0, delimiter=',')
+#b = np.loadtxt(f'{ruta_carpeta}/bpr.txt',skiprows = 0, delimiter=',')
+#np.reshape(b, (len(b),1))
 
 inst = SEL(A, b)
-x = inst.metodo_directo('palu')
+x = inst.resolucion_jacobi(itera, tol)[0]
+print(x)
 
-np.savetxt(f'{ruta_carpeta}/xpr.txt', x, fmt = '%.3f', encoding='utf-8')
+#np.savetxt(f'{ruta_carpeta}/xpr.txt', x, fmt = '%.3f', encoding='utf-8')
 
 df = pd.DataFrame(x)
 df.to_csv(f'{ruta_carpeta}/xpr.csv', sep=';', decimal=',', header = False, index = False, float_format = '%.3f')
