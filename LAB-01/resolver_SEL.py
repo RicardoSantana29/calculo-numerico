@@ -6,7 +6,7 @@ class SEL():
     def __init__(self, A, b):
         self.A = np.array(A, dtype='f')
         self.b = np.reshape(np.array(b, dtype='f'), (len(b),1))
-        self.x0 = np.zeros_like(b, dtype='f') #por defecto [[0], [0], [0],...]
+        self.x0 = np.reshape(np.random.randint(10, size=(len(A),1)), (len(b),1))
         self.D = np.diag(np.diagonal(A))
         self.Al = -np.tril(A, -1)
         self.Au = -np.triu(A, 1)
@@ -22,14 +22,14 @@ class SEL():
             return self.resolucion_cholesky()
 
     #menu de metodos iterativos
-    def metodo_iterativo(self,nombre):
+    def metodo_iterativo(self, nombre, iteraciones, tolerancia, omega):
         nombre = nombre.lower()
         if nombre == 'jacobi':
-            return self.resolucion_jacobi()
+            return self.resolucion_jacobi(iteraciones, tolerancia)
         elif nombre == 'seidel':
-            return self.resolucion_seidel()
+            return self.resolucion_seidel(iteraciones, tolerancia)
         elif nombre == 'sor':
-            return self.resolucion_sor()
+            return self.resolucion_sor(iteraciones, tolerancia, omega)
 
     #herramientas
     def sustitucion_progresiva(self,triangular_inferior,vector):
@@ -52,17 +52,14 @@ class SEL():
         return sol
 
     def verificacion_iterativa(self):
-        n, m = A.shape
+        n, m = self.A.shape
         if m != n:
             return 'La Matriz A no es cuadrada'
         
-        n1, m1 = b.shape
+        n1, m1 = self.b.shape
         if n1 != n or m1 != 1:
             return 'Medida del vector independiente no valida'
-        
-        n1, m1 = self.x0.shape
-        if n1 != n or m1 != 1:
-            return 'Medida del iterado inicial no valida'
+
         
         if np.linalg.matrix_rank(self.A) != n or np.linalg.matrix_rank(self.A) != m:
             return 'Sistema incompatible'
@@ -74,7 +71,7 @@ class SEL():
     #metodo de eliminacion gaussiana por pivoto parcial
     def resolucion_gaussiana(self):
         #copias
-        A, b = self.A, self.b
+        A, b = np.copy(self.A), np.copy(self.b)
         
         (n,m) = A.shape
         if (m!=n):
@@ -135,7 +132,7 @@ class SEL():
         return {'P':P, 'A':self.A, 'L':L, 'U':U}
 
     def resolucion_palu(self):
-        A, b = self.A, self.b
+        A, b = np.copy(self.A), np.copy(self.b)
 
         palu = self.factorizacion_palu()
         w = np.matmul(palu['P'], b)
@@ -164,8 +161,8 @@ class SEL():
 
         return L_chlk, L_chlk.T
 
-    def factorifacion_cholesky(self):
-        A = self.A
+    def factorizacion_cholesky(self):
+        A = np.copy(self.A)
         
         n, m = A.shape
         U = np.zeros((n, m))
@@ -194,10 +191,15 @@ class SEL():
         return L, U
 
     def resolucion_cholesky(self):
-        A, b = self.A, self.b
+        A, b = np.copy(self.A), np.copy(self.b)
+        
+        aux = self.factorizacion_cholesky()
 
-        L, Lt = self.factorizacion_cholesky_palu()
-        #L, Lt = self.factorizacion_cholesky()
+        #L, Lt = self.factorizacion_cholesky_palu()
+        if not type(aux) == str:
+            L, Lt = aux
+        else:
+            return aux
         
         #resolviendo Ly=b
         y = self.sustitucion_progresiva(L, b)
@@ -301,4 +303,3 @@ class SEL():
             rk = np.matmul(self.A, xk) - self.b
             Nrk = np.linalg.norm(rk, 1)
             k += 1
-

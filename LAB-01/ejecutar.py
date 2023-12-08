@@ -11,7 +11,7 @@ import pandas as pd
 #A=np.array([[5,-1,1,1],[1,4,0,1],[3,-1,6,0],[0,1,-1,3]],dtype='f')
 #b=np.array([[5],[2],[-3],[4]],dtype='f')
 itera=100
-tol=0.0000001
+tol=0.000001
 
 ruta_carpeta = sys.path[0]
 
@@ -28,5 +28,5 @@ print(x)
 
 #np.savetxt(f'{ruta_carpeta}/xpr.txt', x, fmt = '%.3f', encoding='utf-8')
 
-df = pd.DataFrame(x)
-df.to_csv(f'{ruta_carpeta}/xpr.csv', sep=';', decimal=',', header = False, index = False, float_format = '%.3f')
+#df = pd.DataFrame(x)
+#df.to_csv(f'{ruta_carpeta}/xpr.csv', sep=';', decimal=',', header = False, index = False, float_format = '%.3f')
