@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+from sympy.abc import x,y,z
 
 class data():
     def __init__(self, abscisas, ordenadas):
@@ -14,10 +15,11 @@ class data():
         return error
 
     def graficar_pol_sp(self, polinomio, titulo):
+        x = sp.symbols('x')
         plt.grid()
         plt.plot(self.x,self.y,'bo')
 
-        d = np.linspace(min(self.x),max(self.x))
+        d = np.linspace(min(self.x),max(self.x),100)
         f = [polinomio.subs(x,i) for i in d]
         plt.plot(d,f,'r-')
 
@@ -124,9 +126,9 @@ class data():
 
         return C, p
 
-    def PoliTrigCoefi(self, G):
-        X = self.x #copias
-        Y = self.y
+    def __coeficientes_poli_trig(self, G):
+        X = np.linspace(0,2*np.pi,len(self.x)) #copias
+        Y = self.y.copy()
         
         n = len(X) - 1
         maxg = int((n - 1) / 2)
@@ -150,9 +152,11 @@ class data():
 
         return A, B
 
-    def polinomio_trigonometrico(A, B, x, G):
+    def polinomio_trigonometrico(self, G):
+        A, B = self.__coeficientes_poli_trig(G)
+        var = (2*sp.pi/max(self.x))*x
         f = A[0]
         for k in range(1, G + 1):
-            f = f + A[k] * np.cos(k * x) + B[k] * np.sin(k * x)
+            f += A[k] * sp.cos(k * var) + B[k] * sp.sin(k * var)
 
         return f
