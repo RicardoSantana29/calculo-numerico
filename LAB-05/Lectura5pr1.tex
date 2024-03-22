@@ -1,0 +1,725 @@
+\documentclass{report}
+\renewcommand{\familydefault}{\sfdefault} % Cambia la fuente a sans serif
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage[a4paper, margin=2.54cm]{geometry}
+\usepackage{helvet} % Fuente sans serif
+\usepackage{indentfirst} % Agrega una sangría a los párrafos que siguen a los títulos de las secciones
+\usepackage[none]{hyphenat} % Desactiva todos los guiones
+\usepackage{amssymb} % Para representar los números complejos
+\usepackage{amsmath} % El paquete amsmath es por las ecuaciones
+\usepackage{setspace} % Para poder establecer un terlineado doble
+\pagestyle{fancy}
+\fancyhf{} % Limpia los encabezados y pies de página existentes
+\rhead{\thepage} % Coloca el número de página en la esquina superior derecha
+\renewcommand{\headrulewidth}{0pt} % Elimina la línea horizontal
+\numberwithin{subsection}{section} % Reconteo de las subsecciones dentro de las secciones
+\renewcommand\thesection{\arabic{section}} % Modifica la numeración de las secciones
+\setlength{\parindent}{1.27cm} % Establece la longitud de la sangría en 1.27 cm
+
+\begin{document}
+\doublespacing
+
+\begin{titlepage}
+    \centering
+    {\large Universidad Central de Venezuela \par}
+    {\large Facultad de Ingeniería \par}
+    {\large Escuela de Ingeniería Eléctrica \par}
+    {\large Departamento de Electrónica, Computación y Control \par}
+    \vspace*{\fill}
+    {\Huge Autovalores y Autovectores \par} % Título sin negritas ni cursivas
+    {\LARGE Cálculo Numérico (2514) \par}
+    \vspace*{\fill}
+    \begin{flushright}
+    {\Large Br. Mendoza Romina \par doblaje. Ricardo Santana}
+    \end{flushright}
+    \vfill
+    {\large Marzo 2024 \par}
+\end{titlepage}
+
+% Aquí empieza el informe
+\begin{abstract}
+    
+    El escrito a presentar contiene los conocimientos mínimos necesarios para discutir y profundizar, en clase, de los temas: Autovalores y autovectores, y el método de potencia.
+
+\end{abstract}% {\textnormal{Resumen}}
+
+\section{\textnormal{Álgebra lineal y eigenvalores}} % Título alineado a la izquierda y enumerado.
+
+Para determinar los autovalores de una matriz $ A _{n\times n} $, construimos el polinomio característico
+
+\begin{equation}
+p \left( \lambda \right) = det \left( A - \lambda I \right)
+\end{equation}
+
+y, entonce, se determinan sus ceros. Encontrar el determinante de una matriz $ n\text{x}n $ es caro desde el punto de vista computacional y hallar buenas aproximaciones para las raíces de $ p \left( \lambda \right) $ también es difícil.
+
+En el siguiente documento se hablará para resolver un sistema lineal hay una técnica iterativa que convergerá si todos los autovalores asociados con el problema tienen magnitud menor que $ 1 $. Los valores exactos de los autovalores en este caso no son muy importantes, sólo la región de un plano complejo en el que se encuentran.
+
+\subsection{\textnormal{Teorema 1: Círculo de Geršgorin}}
+
+Sea $A$ una matriz $n\times n$ y $R_i$ denota el círculo en el plano complejo con centro $a_{ii}$ y radio $\sum_{j=1,j\neq i}^{n}\left| a_{ij} \right|$; es decir,
+\begin{equation}
+R_{i} = \left\{ z \in \mathbb{C} : \left| z - a_{ii} \right| \le \sum_{j=1,j\neq i}^{n}\left| a_{ij} \right| \right\},
+\end{equation}
+donde C denota el plano complejo. Los autovalores de $A$ están contenidos en la unión de estos círculos, $R=\bigcup_{i=1}^{n}R_{i}$. Además, la unión de cualquier $k$ de los círculos que no cruzan el resto de $\left( n - k \right)$, contiene precisamente $k$ (multiplicidades contadas) de los autovalores.
+
+\subsubsection*{Ejemplo 1}
+
+Determine los círculos Geršgorin para la matriz
+\begin{equation*}
+A =\begin{bmatrix}
+4 & 1 & 1 \\
+0 & 2 & 1 \\
+-2 & 0 & 9
+\end{bmatrix}
+\end{equation*}
+y úselos para encontrar los límites del radio espectral de $A$.
+
+\textbf{Solución:} Los círculos en el teorema de Geršgorin son:
+\begin{equation*}
+R_{1} = \left\{ z \in \mathbb{C} : \left| z - 4 \right| \le 2 \right\}, R_{2} = \left\{ z \in \mathbb{C} : \left| z - 2 \right| \le 1 \right\}, R_{1} = \left\{ z \in \mathbb{C} : \left| z - 9 \right| \le 2 \right\}.
+\end{equation*}
+Puesto que $R_{1}$ y $R_{2}$ están separados de $R_{3}$, existen precisamente dos autovalores dentro de $R_{1}\bigcup R_{2}$ y uno dentro de $R_{3}$. Además, $p(A)= \max_{1\le i\le 3} \left| \lambda_{i} \right|$, por lo que $7 \le p(A) \le 11$.
+
+La determinación de las regiones en las que se encuentran es el primer paso para hallar las aproximaciones porque nos da aproximaciones iniciales.
+
+\subsection{\textnormal{Definición 1}}
+
+Sea $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( k \right)} \right\}$ un conjunto de vectores. El conjunto es linealmente independiente si, siempre que
+\begin{equation}
+\textbf{0} = \alpha_{1}\textbf{v}^{\left( 1 \right)} + \alpha_{2}\textbf{v}^{\left( 2 \right)} + \alpha_{3}\textbf{v}^{\left( 3 \right)} + ... + \alpha_{k}\textbf{v}^{\left( k \right)}
+\end{equation}
+entonces, $\alpha_{i}=0$, para cada $i = 0, 1, ..., k$. De lo contrario, el conjunto de vectores es linealmente dependiente.
+
+Observe que cualquier conjunto de vectores que contiene a el vector nulo es linealmente dependiente.
+
+\subsection{\textnormal{Teorema 2}}
+
+Suponga que $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( k \right)} \right\}$ es un conjunto de $n$ vectores linealmente independiente en $\mathbb{R}^{n}$. Entonces, para cualquier vector $\textbf{x} \in \mathbb{R}^{n}$, existe un único conjunto de constantes $\beta_{1}, \beta_{2}, ..., \beta_{n}$ con
+\begin{equation}
+\textbf{x} = \beta_{1}\textbf{v}^{\left( 1 \right)} + \beta_{2}\textbf{v}^{\left( 2 \right)} + \beta_{3}\textbf{v}^{\left( 3 \right)} + ... + \beta_{k}\textbf{v}^{\left( k \right)}
+\end{equation}
+
+\subsection{\textnormal{Definición 2}}
+
+Cualquier conjunto de $n$ vectores linealmente independiente en $\mathbb{R}^{n}$ recibe el nombre de base para $\mathbb{R}^{n}$.
+
+\subsubsection*{Ejemplo 2}
+
+\begin{itemize}
+    \item Muestre que ${\bf v}^{(1)} = (1,0,0)^t$, ${\bf v}^{(2)} = (-1,1,1)^t$, ${\bf v}^{(3)} = (0,4,2)^t$ es una base para $\mathbb{R}^3$, y
+    \item dado un vector arbitrario ${\bf x} \in \mathbb{R}^3$, encuentre $\beta_1$, $\beta_2$ y $\beta_3$ con
+    $${\bf x} = \beta_1{\bf v}^{(1)} + \beta_2{\bf v}^{(2)} + \beta_3{\bf v}^{(3)}$$
+\end{itemize}
+
+{\bf Solución.}
+
+\begin{itemize}
+
+    \item Sean $\alpha_1$, $\alpha_2$ y $\alpha_3$ números con ${\bf 0} = \alpha_1{\bf v}^{(1)} + \alpha_2{\bf v}^{(2)} + \alpha_3{\bf v}^{(3)}$
+    
+    \begin{align*}
+        (0,0,0)^t & = \alpha_1(1,0,0)^t + \alpha_2(-1,1,1)^t + \alpha_3(0,4,2)^t \\
+        & = (\alpha_1 - \alpha_2, \alpha_2 + 4\alpha_3, \alpha_2 + 2\alpha_3)^t
+    \end{align*}
+
+    por lo que $\alpha_1 - \alpha_2 = 0$, $\alpha_2 + 4\alpha_3 = 0$, y $\alpha_2 + 2\alpha_3 = 0$
+
+    La única solución para este sistema es $\alpha_1 = \alpha_2 = \alpha_3 = 0$, por lo que este conjunto $\{v^{(1)}, v^{(2)}, v^{(3)}\}$ de tres vectores linealmente independientes en $\mathbb{R}^3$ es una base para $\mathbb{R}^3$.
+
+    \item Sea ${\bf x} = (x_1, x_2, x_3)^t$ un vector en $\mathbb{R}^3$. Resolviendo
+    
+    \begin{align*}
+        {\bf x} & = \beta_1{\bf v}^{(1)} + \beta_2{\bf v}^{(2)} + \beta_3{\bf v}^{(3)} \\
+                & = \beta_1(1,0,0)^t + \beta_2(-1,1,1)^t + \beta_3(0,4,2)^t \\
+                & = (\beta_1 - \beta_2, \beta_2 + 4\beta_3, \beta_2 + 2\beta_3)^t
+    \end{align*}
+
+    es equivalente a resolver para $\beta_1$, $\beta_2$ y $\beta_3$ en el sistema
+
+    $$\beta_1 - \beta_2 = 0, \; \beta_2 + 4\beta_3 = 0, \; \beta_2 + 2\beta_3 = 0$$
+
+    Este sistema tiene la solución única
+
+    $$\beta_1 = x_1 - x_2 + 2x_3, \; \beta_2 = 2x_3 - x_2, \; \beta_3 = {1 \over 2}(x_2 - x_3).$$
+    
+\end{itemize}
+
+\subsection{\textnormal{Teorema 3}}
+
+Si $A$ es una matriz y $\lambda_{1}, ..., \lambda_{k}$ son autovalores distintos de $A$ con autovectores asociados $\textbf{x}^{\left( 1 \right)}, \textbf{x}^{\left( 2 \right)}, \textbf{x}^{\left( 3 \right)}, ..., \textbf{x}^{\left( k \right)}$, entonces $\left\{ \textbf{x}^{\left( 1 \right)}, \textbf{x}^{\left( 2 \right)}, \textbf{x}^{\left( 3 \right)}, ..., \textbf{x}^{\left( k \right)} \right\}$ es un conjunto linealmente independiente.
+
+\subsubsection*{Ejemplo 3}
+
+    Muestre que se puede formar una base para $\mathbb{R}^3$ usando los eigenvectores de la matriz 3 \times 3
+
+    \begin{equation*}
+        A =\begin{bmatrix}
+        2 & 0 & 0 \\
+        1 & 1 & 2 \\
+        1 & -1 & 4
+        \end{bmatrix}
+    \end{equation*}
+
+    {\bf Solución.}
+
+    El polinomio característico de $A$ es
+
+    \begin{align*}
+        p(\lambda) &= det(A - \lambda I) = det\begin{bmatrix}
+                                                2 & 0 & 0 \\
+                                                1 & 1 & 2 \\
+                                                1 & -1 & 4
+                                                \end{bmatrix} \\
+        &= -(\lambda^3 - 7\lambda^2 + 16\lambda  - 12) = -(\lambda  - 3)(\lambda  - 2)^2,
+    \end{align*}
+
+    por lo que existen dos eigenvalores de $A: λ_1 = 3$ y $λ_2 = 2$.
+
+    Un eigenvector $x_1 \dot$ correspondiente al eigenvalor $λ_1 = 3$ es una solución para la ecuación de vector-matriz $(A - 3 · I )x_1 = 0$, por lo que
+
+    \begin{array}{ccccc}
+        \begin{bmatrix}
+            0 \\ 0 \\ 0
+        \end{bmatrix} &=&
+        \begin{bmatrix}
+            -1 & 0 & 0 \\
+            1 & -2 & 2 \\
+            1 & -1 & 1
+        \end{bmatrix} & \cdot &
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix}
+    \end{array}
+
+    lo cual implica que $x_1 = 0$ y $x_2$ = $x_3$.
+
+    Cualquier valor diferente de cero de $x_3$ produce un eigenvector para el eigenvalor λ1 = 3. Por ejemplo cuando $x_3 = 1$, tenemos el eigenvector $x_1 = (0, 1, 1)^t$, y cualquier eigenvector de A correspondiente a λ = 3 es un múltiplo diferente a cero de x_1.
+    
+    Un eigenvector $x = 0$ de A asociado con $λ_2 = 2$ es una solución del sistema $(A - 2 · I )x = 0$, por lo que
+
+    \begin{array}{ccccc}
+        \begin{bmatrix}
+            0 \\ 0 \\ 0
+        \end{bmatrix} &=&
+        \begin{bmatrix}
+            0 & 0 & 0 \\
+            1 & -1 & 2 \\
+            1 & -1 & 2
+        \end{bmatrix} & \cdot &
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix}
+    \end{array}
+
+    En este caso, el eigenvector sólo tiene que satisfacer la ecuación
+
+    $$x_1 - x_2 + 2x_3 = 0,$$
+
+    lo cual se puede realizar de diferentes formas. Por ejemplo, cuando $x_1 = 0$, tenemos $x_2 = 2x_3$, por lo que una elección sería $x_2 = (0, 2, 1)^t$. También podríamos seleccionar $x_2 = 0$, lo cual requiere que $x_1 = -2x_3$. Por lo tanto, $x_3 = (-2, 0, 1)^t$ da un segundo eigenvector para el eigenvalor $λ_2 = 2$ que no es un múltiplo de $x_2$. Los eigenvectores de A correspondientes al eigenvalor $λ_2 = 2$ generan un plano entero. Este plano se describe mediante todos los vectores de la forma
+
+    $$\alpha x_2 + βx_3 = (-2\beta, 2\alpha , \alpha  + \beta)^t$$
+
+    para constantes arbitrarias \alpha y \beta, siempre y cuando al menos una de las constantes sea diferente de cero.
+
+    En este ejemplo encontramos que $λ_1 = 3$ tiene el eigenvector $x_1 = (0, 1, 1)^t$ y que hay dos eigenvectores linealmente independientes $x_2 = (0, 2, 1)^t$ y $x_3 = (-2, 0, 1)^t$ correspondientes a $λ_2 = 2$.
+
+    $$\{ x_1, x_2, x_3\} = \{(0, 1, 1)^t, (0, 2, 1)^t, (-2, 0, 1)^t \}$$
+
+    es linealmente independiente y, por lo tanto, forma una base para $\mathbb{R}^3$.
+
+\subsubsection*{Ejemplo 4}
+
+    Muestre que ningún conjunto de eigenvectores de la matriz 3 \times 3
+
+    $$B = \begin{bmatrix}
+        2 & 1 & 0 \\
+        0 & 2 & 0 \\
+        0 & 0 & 3
+    \end{bmatrix}$$
+
+    puede formar una base para $\mathbb{R}^3$.
+
+    {\bf Solución.}
+
+    Esta matriz también tiene el mismo polinomio característico que la matriz A en el ejemplo 3.
+
+    $$p(\lambda) = det\begin{bmatrix}
+                        2-\lambda & 1 & 0 \\
+                        0 & 2-\lambda & 0 \\
+                        0 & 0 & 3-\lambda
+                    \end{bmatrix} = (\lambda  - 3)(\lambda  - 2)^2,$$
+
+    por lo que sus eigenvalores son iguales a los de A en el ejemplo 3, es decir, $λ_1 = 3$ y $λ_2 = 2$.
+    
+    Para determinar los eigenvectores para B correspondientes al eigenvalor $λ_1 = 3$, necesitamos
+    resolver el sistema $(B - 3\cdot I)x = 0$, por lo que
+
+    \begin{equation*}
+        \begin{bmatrix}
+            0 \\ 0 \\ 0
+        \end{bmatrix} = (B - 3I)
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix} =
+        \begin{bmatrix}
+            -1 & 0 & 0 \\
+            1 & -2 & 2 \\
+            1 & -1 & 1
+        \end{bmatrix}  \cdot 
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix} =
+        \begin{bmatrix}
+            -x_1 + x_2 \\ -x_2 \\ 0
+        \end{bmatrix}
+    \end{equation*}
+
+    Por lo tanto, $x_2 = 0$, $x_1 = x_2 = 0$ y $x_3$ es arbitrario. Haciendo $x_3 = 1$ esto nos da el único eigenvector linealmente independiente $(0, 0, 1)^t$ correspondiente a $λ_1 = 3$.
+
+    Considerando $λ_2 = 2$. Si
+
+    \begin{equation*}
+        \begin{bmatrix}
+            0 \\ 0 \\ 0
+        \end{bmatrix} = (B - 2I)
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix} =
+        \begin{bmatrix}
+            0 & 1 & 0 \\
+            0 & 0 & 0 \\
+            0 & 0 & 1
+        \end{bmatrix}  \cdot 
+        \begin{bmatrix}
+            x_1 \\ x_2 \\ x_3
+        \end{bmatrix} =
+        \begin{bmatrix}
+            x_2 \\ 0 \\ x_3
+        \end{bmatrix}
+    \end{equation*}
+    
+    entonces x2 = 0, x3 = 0, y x1 es arbitrario. Existe sólo un eigenvector linealmente independiente que corresponde a λ2 = 2, lo que se puede expresar como (1, 0, 0)t, aun cuando λ2 = 2 fue un cero de multiplicidad dos del polinomio característico de B.
+
+    Es claro que estos dos eigenvectores no son suficientes para formar una base en $\mathbb{R}^3$. En particular, $(0, 1, 0)^t$ no es una combinación lineal de {(0, 0, 1)^t, (1, 0, 0)^t}.
+
+\subsection{\textnormal{Definición 3}}
+
+Un conjunto de vectores $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( k \right)} \right\}$, recibe el nombre de \textbf{ortogonal} si $\left( \textbf{v}^{\left( i \right)} \right)^{t}\textbf{v}^{\left( j \right)} = \textbf{0}$, para toda $i\neq j$. Si, además $\left( \textbf{v}^{\left( i \right)} \right)^{t}\textbf{v}^{\left( i \right)} = 1$, para toda $i = 1, 2, ..., n$. Entonces el conjunto recibe el nombre de \textbf{ortonormal.}
+
+Puesto que $\textbf{x}^{t}\textbf{x}=\left\| \textbf{x} \right\|_{2}^{2}$ para  cualquier $\textbf{x}$ en $\mathbb{R}^{n}$, un conjunto de vectores ortogonales \\$\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( k \right)} \right\}$ es ortonormal si y solo si
+\begin{equation*}
+\left\| \textbf{v}^{\left( i \right)} \right\|_{2} = 1, \quad \text{para cada } i = 1, 2, ..., n
+\end{equation*}
+
+\subsubsection*{Ejemplo 5}
+
+\begin{itemize}
+    \item Muestre que los vectores $v^{(1)} = (0, 4, 2)^t$, $v^{(2)} = (-5,-1, 2)^t$ y $v^{(3)} = (1,-1, 2)^t$ forman un conjunto ortogonal y
+    \item Úselos para determinar un conjunto de vectores ortonormales.
+\end{itemize}
+
+begin{itemize}
+    \item Tenemos $(v^{(1)})^t v(2) = 0(-5) + 4(-1) + 2(2) = 0$,
+    
+    $$(v^{(1)})^t v^{(3)} = 0(1) + 4(-1) + 2(2) = 0, \; y \; (v^{(2)})^t v^{(3)} = -5(1) - 1(-1) + 2(2) = 0,$$
+
+    por lo que los vectores son ortogonales y forman una base para $\mathbb{R}^n$. Las normas $l_2$ de estos vectores son
+
+    $$\left\| \textbf{v}^{(1)} \right\|_{2} = 2\sqrt{5}, \; \left\| \textbf{v}^{(2)} \right\|_{2} = \sqrt{30}, \; \left\| \textbf{v}^{(3)} \right\|_{2} = \sqrt{6}$$
+
+    \item Los vectores
+
+    \begin{align*}
+        \textbf{u}^{(1)} &= \frac{ \textbf{v}^{(1)} }{\left\| \textbf{v}^{(1)} \right\|_{2}} = \left( \frac{0}{2\sqrt{5}}, \frac{4}{2\sqrt{5}}, \frac{2}{2\sqrt{5}}\right)^t = \left( 0, \frac{2\sqrt{5}}{5}, \frac{\sqrt{5}}{5}\right)^t \\
+
+        \textbf{u}^{(2)} &= \frac{ \textbf{v}^{(2)} }{\left\| \textbf{v}^{(2)} \right\|_{2}} = \left( \frac{-5}{\sqrt{30}}, \frac{-1}{\sqrt{30}}, \frac{2}{\sqrt{30}}\right)^t = \left( -\frac{\sqrt{30}}{6}, -\frac{\sqrt{30}}{30}, \frac{\sqrt{30}}{15}\right)^t \\
+
+        \textbf{u}^{(3)} &= \frac{ \textbf{v}^{(3)} }{\left\| \textbf{v}^{(3)} \right\|_{2}} = \left( \frac{1}{\sqrt{6}}, \frac{-1}{\sqrt{6}}, \frac{2}{\sqrt{6}}\right)^t = \left( \frac{\sqrt{6}}{6}, -\frac{\sqrt{6}}{6}, \frac{\sqrt{6}}{3}\right)^t \\
+    \end{align*}
+    
+    forman un conjunto ortonormal ya que heredan la ortogonalidad a partir de $v^{(1)}$, $v^{(2)}$, y $v^{(3)}$. Además,
+
+    $$\left\| \textbf{u}^{(1)} \right\| = \left\| \textbf{u}^{(2)} \right\| = \left\| \textbf{u}^{(3)} \right\| = 1$$ 
+\end{itemize}
+
+\subsection{\textnormal{Teorema 4}}
+
+Un conjunto ortogonal de vectores diferentes a cero es linealmente independiente.
+
+Existe  un proceso, también conocido como Gram-Schmidt, que nos permite construir una base ortogonal para $\mathbb{R}^{n}$ dado un conjunto de $n$ vectores linealmente independiente en $\mathbb{R}^{n}$.
+
+\subsection{\textnormal{Teorema 5}}
+
+Sea $\left\{ \textbf{x}^{\left( 1 \right)}, \textbf{x}^{\left( 2 \right)}, \textbf{x}^{\left( 3 \right)}, ..., \textbf{x}^{\left( k \right)} \right\}$ un conjunto de $k$ vectores linealmente independientes en $\mathbb{R}^{n}$. Entonces $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( k \right)} \right\}$ definido mediante
+\begin{align*}
+\textbf{v}_{1} &= \textbf{x}_{1}, \\
+\textbf{v}_{2} &= \textbf{x}_{2} - \left( \frac{ \textbf{v}_{1}^{t} .\textbf{x}_{2}}{ \textbf{v}_{1}^{t} .\textbf{v}_{1}} \right)\textbf{v}_{1}, \\
+\textbf{v}_{3} &= \textbf{x}_{3} - \left( \frac{ \textbf{v}_{1}^{t} .\textbf{x}_{3}}{ \textbf{v}_{1}^{t} .\textbf{v}_{1}} \right)\textbf{v}_{1} - \left( \frac{ \textbf{v}_{2}^{t} .\textbf{x}_{3}}{ \textbf{v}_{2}^{t} .\textbf{v}_{2}} \right)\textbf{v}_{2}, \\
+\textbf{v}_{k} &= \textbf{x}_{k} - \sum_{i=1}^{k-1} \left( \frac{ \textbf{v}_{i}^{t} .\textbf{x}_{k}}{ \textbf{v}_{i}^{t} .\textbf{v}_{i}} \right)\textbf{v}_{i}
+\end{align*}
+es un conjunto de $k$ vectores ortogonales es $\mathbb{R}^{n}$.
+
+Observe que cuando el conjunto original de vectores construidos forman una base ortogonal para $\mathbb{R}^{n}$. A partir de esto podemos formar una base ortonormal $\left[ \textbf{u}_{1}, \textbf{u}_{2}, ... , \textbf{u}_{n} \right]$ simplemente al definir para cada $i = 1, 2, ..., n$.
+\begin{equation}
+\textbf{u}_{i} = \frac{ \textbf{v}_{i} }{\left\| \textbf{v}_{i} \right\|_{2}}
+\end{equation}
+
+\subsubsection*{Ejemplo 6}
+
+    Use el proceso de Gram-Schmidt para determinar un conjunto de vectores ortogonales a partir de los vectores linealmente independientes:
+
+    $$x^{(1)} = (1, 0, 0)^t, \; x^{(2)} = (1, 1, 0)^t, \; x^{(3)} = (1, 1, 1)^t.$$
+
+    {\bf Solución.}
+
+    Tenemos los vectores ortogonales $v^{(1)}$, $v^{(2)}$ y $v^{(3)}$, dados por
+
+    \begin{align*}
+        v^{(1)} &= x^{(1)} = (1, 0, 0)^t \\
+        v^{(2)} &= (1, 1, 0)^t - \left(\frac{((1, 0, 0)^t)^t (1, 1, 0)^t}{((1, 0, 0)^t)^t (1, 0, 0)^t}\right) (1, 0, 0)^t = (1, 1, 0)^t - (1, 0, 0)^t = (0, 1, 0)^t \\
+        v^{(3)} &= (1, 1, 1)^t - \left(\frac{((1, 0, 0)^t)^t (1, 1, 1)^t}{((1, 0, 0)^t)^t (1, 0, 0)^t}\right)(1, 0, 0)^t - \left(\frac{((0, 1, 0)^t)^t (1, 1, 1)^t}{((0, 1, 0)^t)^t (0, 1, 0)^t}\right)(0, 1, 0)^t \\
+        &= (1, 1, 1)^t - (1, 0, 0)^t - (0, 1, 0)^t = (0, 0, 1)^t.
+    \end{align*}
+
+    El conjunto $\{v^{(1)}, v^{(2)}, v^{(3)}\}$ resulta ser tanto ortonormal, como ortogonal, pero comúnmente, ésta no es la situación.
+
+\section{\textnormal{El Método de Potencia}}
+
+El método de potencia es una técnica iterativa que se usa para determinar el autovalor dominante de una matriz (es decir, el autovalor con la mayor magnitud). Al modificar ligeramente el método, también se puede usar para determinar otros autovalores. Una característica útil del método de potencia es que no sólo produce un autovalor, sino también un autovector asociado. De hecho, a menudo, el método de potencia se aplica para encontrar un autovector para un autovalor que es determinado por algunos otros medios.
+
+Para aplicar el método de potencia, suponemos que la matriz $A_{n\times n}$ tiene $n$ autovalores $\lambda_{1}, \lambda_{2}, ..., \lambda_{n}$, con un conjunto asociado de autovectores linealmente independientes $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( n \right)} \right\}$. Además, suponemos que $A$ tiene exactamente un autovalor , que es más grande en magnitud, por lo que
+\begin{equation*}
+\left| \lambda_{1} \right| > \left| \lambda_{2} \right| \ge \left| \lambda_{3} \right| \ge ... \ge \left| \lambda_{n} \right| \ge 0
+\end{equation*}
+
+Una matriz $n\times n$ no necesita tener n autovectores linealmente independientes. Cuando esto no es así, el método de potencia puede seguir siendo exitoso, pero no se garantiza que lo sea.
+
+Si $\text{x}$ es cualquier vector en $\mathbb{R}^{n}$, el hecho de que $\left\{ \textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, \textbf{v}^{\left( 3 \right)}, ..., \textbf{v}^{\left( n \right)} \right\}$ es linealmente \\independiente implica que existen constantes $\beta_{1}, \beta_{2}, ..., \beta_{n}$ con
+\begin{equation*}
+\textbf{x} = \sum_{j=1}^{n} \beta_{j} \textbf{v}^{\left( j \right)}.
+\end{equation*}
+
+Al multiplicar ambos lados de esta ecuación por $A, A^{2}, ..., A^{k}, ...$ obtenemos
+\begin{equation*}
+A \textbf{x} = \sum_{j=1}^{n} \beta_{j} A \textbf{v}^{\left( j \right)} = \sum_{j=1}^{n} \beta_{j} \lambda_{j} \textbf{v}^{\left( j \right)}, A^{2} \textbf{x} = \sum_{j=1}^{n} \beta_{j} \lambda_{j} A \textbf{v}^{\left( j \right)} = \sum_{j=1}^{n} \beta_{j} \lambda_{j}^{2} \textbf{v}^{\left( j \right)}
+\end{equation*}
+y, en general, $A^{k} \textbf{x} = \sum_{j=1}^{n} \beta_{j} \lambda_{j}^{k} \textbf{v}^{\left( j \right)}$.
+
+Si $\lambda_{1}^{k}$ se factoriza a partir de cada término en el lado derecho de la última ecuación, entonces
+\begin{equation*}
+A^{k} \textbf{x} = \lambda_{1}^{k} \sum_{j=1}^{n} \beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right)^{k} \textbf{v}^{\left( j \right)}
+\end{equation*}
+
+Puesto que $\left| \lambda_{1} \right| > \left| \lambda_{j} \right|$, para todas $j = 2, 3, ..., n$, tenemos $\lim_{k \to \infty } \left( \frac{\lambda_{j}}{\lambda_{1}} \right)^{k} = 0$, y
+\begin{equation}
+\lim_{k \to \infty } A^{k} \textbf{x} = \lim_{k \to \infty } \lambda_{1}^{k} \beta_{1} \textbf{v}^{\left( 1 \right)}
+\end{equation}
+La sucesión en la ecuación 6 converge a $0$ si $\left| \lambda_{1} \right| < 1$ y diverge si $\left| \lambda_{1} \right| > 1$, siempre y cuando, $\beta_{1} \neq 0$. Por consiguiente, las entradas en $A^{k} \textbf{x}$ aumentarán con $k$ si $\left| \lambda_{1} \right| > 1$, y tienden a $0$ si $\left| \lambda_{1} \right| < 1$, tal vez, al resultar en desborde y subdesborde. Para cuidar esta posibilidad, escalamos las potencias de $A^{k} \textbf{x}$ en una forma apropiada para garantizar que la cota en la ecuación 6 es finita y diferente de cero. El escalamiento comienza al seleccionar $\textbf{x}$ como vector unitario $\textbf{x}^{\left( 0 \right)}$ relativo a $\left\| \cdot \right\|_{\infty }$ y seleccionar un componente $\text{x}_{p_{0}}^{\left( 0 \right)}$ de $\textbf{x}^{\left( 0 \right)}$ con
+\begin{equation*}
+\text{x}_{p_{0}}^{\left( 0 \right)} = 1 = \left\| \textbf{x}^{\left( 0 \right)} \right\|_{\infty }
+\end{equation*}
+Sea $\textbf{y}^{\left( 1 \right)} = A \textbf{x}^{\left( 0 \right)}$ y defina $\mu_{1} = \text{y}_{p_{0}}^{\left( 1 \right)}$. Entonces
+\begin{equation*}
+\mu_{1} = \text{y}_{p_{0}}^{\left( 1 \right)} = \frac{\text{y}_{p_{0}}^{\left( 1 \right)}}{\text{x}_{p_{0}}^{\left( 0 \right)}} = \frac{\beta_{1} \lambda_{1} v_{p_{0}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \lambda_{j} v_{p_{0}}^{\left( j \right)}}{\beta_{1} v_{p_{0}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} v_{p_{0}}^{\left( j \right)}} = \lambda_{1} \left[ \frac{\beta_{1} v_{p_{0}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right) v_{p_{0}}^{\left( j \right)}}{\beta_{1} v_{p_{0}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j}v_{p_{0}}^{\left( j \right)}} \right]
+\end{equation*}
+Sea $p_{1}$ el entero mínimo tal que
+\begin{equation*}
+\left| \text{y}_{p_{1}}^{\left( 1 \right)} \right| = \left\| \textbf{y}^{\left( 1 \right)} \right\|_{\infty }
+\end{equation*}
+y defina $\textbf{x}^{\left( 1 \right)}$ mediante
+\begin{equation*}
+\textbf{x}^{\left( 1 \right)} = \frac{ 1 }{ \text{y}_{p_{1}}^{\left( 1 \right)} } \textbf{y}^{\left( 1 \right)} = \frac{ 1 }{ \text{y}_{p_{1}}^{\left( 1 \right)} } A \textbf{x}^{\left( 0 \right)}
+\end{equation*}
+Entonces
+\begin{equation*}
+\text{x}_{p_{1}}^{\left( 1 \right)} = 1 = \left\| \textbf{x}^{\left( 1 \right)} \right\|_{\infty }
+\end{equation*}
+Ahora defina
+\begin{equation*}
+\textbf{y}^{\left( 2 \right)} = A\textbf{x}^{\left( 1 \right)} = \frac{1}{\text{y}_{p_{1}}^{\left( 1 \right)}} A^{2}\textbf{x}^{\left( 0 \right)}
+\end{equation*}
+y
+\begin{equation*}
+\mu_{2} = \text{y}_{p_{1}}^{\left( 2 \right)} = \frac{\text{y}_{p_{1}}^{\left( 2 \right)}}{\text{x}_{p_{1}}^{\left( 1 \right)}} = \frac{\left[ \beta_{1} \lambda_{1}^{2} v_{p_{1}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \lambda_{j}^{2} v_{p_{1}}^{\left( j \right)} \right] \huge / \normalsize \text{y}_{p_{1}}^{\left( 1 \right)}}{\left[ \beta_{1} \lambda_{1} v_{p_{1}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \lambda_{j} v_{p_{1}}^{\left( j \right)} \right] \huge / \normalsize \text{y}_{p_{1}}^{\left( 1 \right)}} = \lambda_{1} \left[ \frac{\beta_{1} v_{p_{1}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right)^{2} v_{p_{1}}^{\left( j \right)}}{\beta_{1}  v_{p_{1}}^{\left( 1 \right)}+\sum_{j = 2}^{n}\beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right) v_{p_{1}}^{\left( j \right)}} \right]
+\end{equation*}
+Sea $p_{2}$ el entero más pequeño con
+\begin{equation*}
+\left| \text{y}_{p_{2}}^{\left( 2 \right)} \right| = \left\| \textbf{y}^{\left( 2 \right)} \right\|_{\infty }
+\end{equation*}
+y defina
+\begin{equation*}
+\textbf{x}^{\left( 2 \right)} = \frac{1}{\text{y}_{p_{2}}^{\left( 2 \right)}} \textbf{y}^{\left( 2 \right)} = \frac{1}{\text{y}_{p_{2}}^{\left( 2 \right)}} A\textbf{x}^{\left( 1 \right)} = \frac{1}{\text{y}_{p_{2}}^{\left( 2 \right)} . \text{y}_{p_{1}}^{\left( 1 \right)}} A^{2}\textbf{x}^{\left( 0 \right)}
+\end{equation*}
+De manera similar, defina las sucesiones de vectores $\left\{ \textbf{x}^{\left( m \right)} \right\}_{m = 0}^{\infty }$ y $\left\{ \textbf{y}^{\left( m \right)} \right\}_{m = 1}^{\infty }$ y una sucesión de escalares $\left\{ \mu^{\left( m \right)} \right\}_{m = 1}^{\infty }$ de manera inductiva mediante
+\begin{equation*}
+\textbf{y}^{\left( m \right)} = A \textbf{x}^{m-1}
+\end{equation*}
+\begin{equation}
+\mu_{m} = \text{y}_{p_{\left( m-1 \right)}}^{\left( m \right)} = \lambda_{1} \left[ \frac{\beta_{1} v_{p_{\left( m-1 \right)}}^{\left( 1 \right)} + \sum_{j = 2}^{n} \beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right)^{m} v_{p_{\left( m-1 \right)}}^{\left( j \right)}}{\beta_{1}  v_{p_{\left( m-1 \right)}}^{\left( 1 \right)} + \sum_{j = 2}^{n} \beta_{j} \left( \frac{\lambda_{j}}{\lambda_{1}} \right)^{\left( m-1 \right)} v_{p_{\left( m-1 \right)}}^{\left( j \right)}} \right]
+\end{equation}
+y
+\begin{equation*}
+\textbf{x}^{m} = \frac{\textbf{y}^{m}}{\text{y}_{p_{m}}^{m}} = \frac{A^{m}\textbf{x}^{\left( 0 \right)}}{\prod_{k=1}^{m}\text{y}_{p_{k}}^{\left( k \right)}}
+\end{equation*}
+donde en cada paso, $p_{m}$ se usa para representar el entero más pequeño para el que
+\begin{equation*}
+\left| \text{y}_{p_{m}}^{\left( m \right)} \right| = \left\| \textbf{y}^{\left( m \right)} \right\|_{\infty }
+\end{equation*}
+
+Al examinar la ecuación 7, observamos que dado $\left| \frac{\lambda_{j}}{\lambda_{1}} \right| < 1$, para cada $j = 2, 3, ..., n$, $\lim_{m \to \infty } \mu^{\left( m \right)} = \lambda_{1}$, siempre y cuando $\textbf{x}^{\left( 0 \right)}$ se seleccione de tal forma que $\beta_{1} \neq 0$. Además, la sucesión de vectores $\left\{ \textbf{x}^{\left( m \right)} \right\}_{m = 0}^{\infty }$ converge para un autovector asociado con $\lambda_{1}$ que tiene norma $l_{\infty}$ igual a uno.
+
+El método de potencia tiene la desventaja de que es desconocido al principio si la matriz tiene un solo autovalor dominante. Tampoco se conoce cómo $\textbf{x}^{\left( 0 \right)}$ debería seleccionarse para garantizar que su representación en términos de autovectores de la matriz contendrá una contribución diferente de cero de autovectores asociados con el autovalor dominante, si existiera.
+
+%\subsubsection*{Ejemplo 1}
+%Eliminado
+%ESPACIO
+
+\subsection{\textnormal{Convergencia Acelerada}}
+
+Al seleccionar el entero más pequeño $p_{m}$ para el que $\left| \text{y}_{p_{m}}^{\left( m \right)} \right| = \left\| \textbf{y}^{\left( m \right)} \right\|$ garantizará, en general, que al final este índice se vuelve invariante. La velocidad a la que $\left\{ \mu^{\left( m \right)} \right\}_{m=1}^{\infty }$ converge en $\lambda_{1}$ se determina mediante los radios $\left| \lambda_{j} / \lambda_{1} \right|^{m}$, para $j = 2, 3, ..., n$, y en particular por medio $\left| \lambda_{2} / \lambda_{1} \right|^{m}$. La velocidad de convergencia es $O\left( \left| \lambda_{2} / \lambda_{1} \right|^{m} \right)$, por lo que existe una constante $k$, de tal forma que para $m$ grande,
+\begin{equation*}
+\left| \mu^{\left( m \right)} - \lambda_{1} \right| \approx k\left| \frac{\lambda_{2}}{\lambda_{1}} \right|^{m},
+\end{equation*}
+lo que implica que
+\begin{equation*}
+\lim_{m \to \infty} \frac{\left| \mu^{\left( m + 1 \right)} - \lambda_{1} \right|}{\left| \mu^{\left( m \right)} - \lambda_{1} \right|}  \approx k\left| \frac{\lambda_{2}}{\lambda_{1}} \right| < 1.
+\end{equation*}
+La sucesión $\left\{ \mu^{\left( m \right)} \right\}$converge linealmente a $\lambda_{1}$, por lo que el procedimiento $\Delta ^{2}$ de Aitkens se puede utilizar para acelerar la convergencia.
+
+No es necesario que la matriz tenga diferentes autovalores para que el método de potencia converja. Si la matriz tiene un autovalor dominante único, $\lambda_{1}$, con multiplicidad $r$ superior a $1$ y $\textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, ..., \textbf{v}^{\left( r \right)}$ son autovectores linealmente independientes asociados con $\lambda_{1}$, el procedimiento seguirá convergiendo en $\lambda_{1}$. En este caso, la sucesión de vectores $\left\{ \textbf{x}^{\left( m \right)} \right\}_{m=0}^{\infty}$, conveergerá en un autovector $\lambda_{1}$ en la norma $l_{\infty}$ igual a uno que depende de la selección del vector inicial $\textbf{x}^{\left( 0 \right)}$ y es una comninación lineal de $\textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, ..., \textbf{v}^{\left( r \right)}$.
+
+\subsubsection*{Ejemplo 1} % modificado Ejemplo 2
+
+    Use el método de potencia para aproximar el eigenvalor dominante de la matriz
+
+    $$A =\begin{bmatrix}
+        -4 & 14 & 0 \\
+        -5 & 13 & 0 \\
+        -1 & 0 & 2 \\
+    \end{bmatrix}$$
+
+    y, a continuación, aplique el método $\Delta^2$ de Aitkens para las aproximaciones para el eigenvalor de la matriz para acelerar la convergencia.
+
+    {\bf Solución.}
+
+    Esta matriz tiene eigenvalores $\lambda_1 = 6$, $\lambda_2 = 3$, y $\lambda_3 = 2$, por lo que el método de potencia convergerán $x^{(0)} = (1, 1, 1)^t$ , entonces
+
+    $$y^{(1)} = Ax^{(0)} = (10, 8, 1)^t,$$
+
+    por lo que
+
+    $$\left\|y^{(1)}\right\|_{\infty} = 10, \;\; \mu^{(1)} = y_1^{(1)} = 10, \;\; x^{(1)} = {y^{(1)} \over 10} = (1, 0.8, 0.1)^t.$$
+
+    Al continuar de esta forma llegamos a los valores en la tabla \ref{tab:ej1} $\hat{\mu}^{(m)}$ representa la sucesión generada por el procedimiento $\Delta^2$ de Aitkens. Una aproximación para el eigenvalor
+
+    \begin{table}[h!]
+        \centering
+        \caption{aproximación de eigenvalor en el ejemplo 1}
+        \label{tab:ej1}
+        \begin{tabular}{|cccc|} \hline
+            $m$ & $(x^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ \hline
+            0  &  (1, 1, 1)  & & \\
+            1  &  (1, 0.8, 0.1)  &  10 & 6.266667 \\
+            2  &  (1, 0.75, -0.111)  &  7.2 & 6.062473 \\
+            3  &  (1, 0.730769, -0.188803)  &  6.5 & 6.015054 \\
+            4  &  (1, 0.722200, -0.220850)  &  6.230769 & 6.004202 \\
+            5  &  (1, 0.718182, -0.235915)  &  6.111000 & 6.000855  \\
+            6  &  (1, 0.716216, -0.243095)  &  6.054546 & 6.000240 \\
+            7  &  (1, 0.715247, -0.246588)  &  6.027027 & 6.000058  \\
+            8  &  (1, 0.714765, -0.248306)  &  6.013453 & 6.000017  \\
+            9  &  (1, 0.714525, -0.249157)  &  6.006711 & 6.000003  \\
+            10  &  (1, 0.714405, -0.249579)  &  6.003352 & 6.000000 \\
+            11  &  (1, 0.714346, -0.249790)  &  6.001675 & \\
+            12  &  (1, 0.714316, -0.249895)  &  6.000837 & \hline
+        \end{tabular}
+    \end{table}
+
+    dominante 6, en esta etapa es $\hat{\mu}^{(10)} = 6.000000$. El eigenvector unitario $l_{\infty^-}$ aproximado para el eigenvalor 6 es $(x^{(12)})^t = (1, 0.714316,-0.249895)^t.$
+    
+    Aunque la aproximación para el eigenvalor es correcta para los lugares enumerados, la aproximación del eigenvector es considerablemente menos precisa para el eigenvector verdadero $(1, 5/7, -1/4)^t  \approx (1, 0.714286, -0.25)^t.$
+
+\subsection{\textnormal{Matrices Simétricas}}
+
+Cuando $A$ es simétrica, es posible hacer una variación en la selección de los vectores $\textbf{x}^{\left( m \right)}$ y $\textbf{y}^{\left( m \right)}$ y los escalares $\mu^{\left( m \right)}$ para mejorar significativamente el índice de convergencia de la sucesión $\left\{ \mu^{\left( m \right)} \right\}_{m=1}^{\infty}$ para el autovalor dominante $\lambda_{1}$. De hecho, a pesar de que el índice de convergencia del método de potencia general es $O\left( \left| \lambda_{2} / \lambda_{1} \right|^{m} \right)$, para las matrices simétricas es $O\left( \left| \lambda_{2} / \lambda_{1} \right|^{2m} \right)$. Puesto que la sucesión $\left\{ \mu^{\left( m \right)} \right\}$ sigue siendo convergente, también puede aplicarse el procedimiento $\Delta ^{2}$ de Aitkens.
+
+\subsubsection*{Ejemplo 2} % modificado Ejemplo 3
+
+    Aplique tanto el método de potencia como el de potencia simétrica a la matriz
+
+    $$A =\begin{bmatrix}
+        4 & -1 & 1 \\
+        -1 & 3 & -2 \\
+        1 & -2 & 3 \\
+    \end{bmatrix}$$
+
+    usando el método $\Delta^2$ de Aitkens para acelerar la convergencia.
+
+    {\bf Solución.}
+
+    Esta matriz tiene eigenvalores $\lambda_1 = 6$, $\lambda_2 = 3$ y $\lambda_3 = 1$. Un eigenvector para el eigenvector 6 es $(1,-1, 1)^t$. La aplicación del método de potencia a esta matriz con vector inicial $(1, 0, 0)^t$ de los valores de la tabla \ref{tab:ej2}
+
+    \begin{table}[h!]
+        \centering
+        \caption{aproximación de eigenvalor en el ejemplo 2}
+        \label{tab:ej2}
+        \begin{tabular}{|ccccc|} \hline
+            $m$ & $(y^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ & $(x^{(m)})^t$ con $\left\|x^{(m)}\right\|_{\infty} = 1$ \\ \hline
+            0  &                                   &            &           &  (1, 0, 0) \\
+            1  &  (4, -1, 1)                       &  4         &           &  (1, -0.25, 0.25) \\
+            2  &  (4.5, -2.25, 2.25)               &  4.5       & 7         &  (1, -0.5, 0.5) \\
+            3  &  (5, -3.5, 3.5)                   &  5         & 6.2       &  (1, -0.7, 0.7) \\
+            4  &  (5.4, -4.5, 4.5)                 &  5.4       & 6.047617  &  (1, -0.8333¯ , 0.8333) \\
+            5  &  (5.66¯6, -5.166¯6, 5.166¯6)      &  5.666     & 6.011767  &  (1, -0.911765, 0.911765) \\
+            6  &  (5.823529, -5.558824, 5.558824)  &  5.823529  & 6.002931  &  (1, -0.954545, 0.954545) \\
+            7  &  (5.909091, -5.772727, 5.772727)  &  5.909091  & 6.000733  &  (1, -0.976923, 0.976923) \\
+            8  &  (5.953846, -5.884615, 5.884615)  &  5.953846  & 6.000184  &  (1, -0.988372, 0.988372) \\
+            9  &  (5.976744, -5.941861, 5.941861)  &  5.976744  &           &  (1, -0.994163, 0.994163) \\
+            10 &  (5.988327, -5.970817, 5.970817)  &  5.988327  &           &  (1, -0.997076, 0.997076) \\ \hline
+        \end{tabular}
+    \end{table}
+
+    Ahora aplicaremos el método de potencia simétrica a esta matriz con el mismo vector inicial $(1, 0, 0)^t$. Los primeros pasos son
+
+    $$x^{(0)} = (1, 0, 0)^t , \;\; Ax^{(0)} = (4,.1, 1)^t , \;\; M^{(1)} = 4,$$
+
+    y
+
+    $$x^{(1)} = \frac{1}{\left\|Ax^{(0)}\right\|_2}· Ax^{(0)} = (0.942809,-0.235702, 0.235702]^t.$$
+
+    Las entradas restantes se muestran en la tabla \ref{tab:ej22}
+
+    \begin{table}[h!]
+        \centering
+        \caption{entradas restantes en el ejemplo 2}
+        \label{tab:ej22}
+        \begin{tabular}{|ccccc|} \hline
+            $m$ & $(y^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ & $(x^{(m)})^t$ con $\left\|x^{(m)}\right\|_{2} = 1$ \\ \hline
+            0  &  (1, 0, 0) & & & (1, 0, 0)  \\
+            1  &  (4, 1, 1)                       &  4         & 7          &(0.942809, 0.235702, 0.235702) \\
+            2  &  (4.242641, 2.121320, 2.121320)  &  5         &  6.047619  &(0.816497, 0.408248, 0.408248) \\
+            3  &  (4.082483, 2.857738, 2.857738)  &  5.666667  &  6.002932  &(0.710669, 0.497468, 0.497468) \\
+            4  &  (3.837613, 3.198011, 3.198011)  &  5.909091  &  6.000183  &(0.646997, 0.539164, 0.539164) \\
+            5  &  (3.666314, 3.342816, 3.342816)  &  5.976744  &  6.000012  &(0.612836, 0.558763, 0.558763) \\
+            6  &  (3.568871, 3.406650, 3.406650)  &  5.994152  &  6.000000  &(0.595247, 0.568190, 0.568190) \\
+            7  &  (3.517370, 3.436200, 3.436200)  &  5.998536  &  6.000000  &(0.586336, 0.572805, 0.572805) \\
+            8  &  (3.490952, 3.450359, 3.450359)  &  5.999634  &            &(0.581852, 0.575086, 0.575086) \\
+            9  &  (3.477580, 3.457283, 3.457283)  &  5.999908  &            &(0.579603, 0.576220, 0.576220) \\
+            10 &  (3.470854, 3.460706, 3.460706)  &  5.999977  &            &(0.578477, 0.576786, 0.576786) \\ \hline
+        \end{tabular}
+    \end{table}
+
+    El método de potencia simétrica da una convergencia considerablemente más rápida para esta matriz que el método de potencia. Las aproximaciones del eigenvector en el método de potencia converge en $(1,-1, 1)^t$, un vector con norma unitaria en $l_{\infty}$. En el método de potencia simétrica, la convergencia es el vector paralelo $(\sqrt{3}/3, -\sqrt{3}/3, \sqrt{3}/3)^t$, que tiene la norma unitaria en $l_2$.
+
+Si $\lambda$ es un número real que aproxima un autovalor de una matriz simétrica $A$ y $\textbf{x}$ es un autovector asociado aproximado, entonces $A\textbf{x} - \lambda\textbf{x}$ es aproximadamente el vector cero. El siguiente teorema relaciona la norma de este vector para la precisión del autovalor $\lambda$
+
+\subsection{\textnormal{Teorema}}
+
+Suponga que $A$ es una matriz simétrica $n\times n$ con autovalores $\lambda_{1}, \lambda_{2}, ..., \lambda_{n}$. Si $\left\| A\textbf{x} - \lambda\textbf{x} \right\|_{2}<\epsilon$ para algunos números reales $\lambda$ y vector $\textbf{x}$ con $\left\| \textbf{x} \right\|_{2} = 1$. Entoces
+\begin{equation*}
+\min_{1\le j\le n}\left| \lambda_{j}-\lambda \right| < \epsilon.
+\end{equation*}
+
+\subsection{\textnormal{Método de Potencia Inversa}}
+
+El \textbf{método de potencia inversa} es una modificación del método de potencia que da una convergencia más rápida. Se usa para determinar el autovalor de $A$ que está más cerca de un número específico $q$.
+
+Supongamos que la matriz $A$ tiene autovalores $\lambda_{1}, \lambda_{2}, ..., \lambda_{n}$ con autovectores linealmente independientes $\textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, ..., \textbf{v}^{\left( n \right)}$. Los autovalores de $\left( A - qI \right)^{-1}$, donde $q\neq \lambda_{i}$, para $i = 1, 2, ..., n$, son
+\begin{equation*}
+\frac{1}{\lambda_{1} - q}, \frac{1}{\lambda_{2} - q}, ..., \frac{1}{\lambda_{n} - q},
+\end{equation*}
+con estos mismos autovectores $\textbf{v}^{\left( 1 \right)}, \textbf{v}^{\left( 2 \right)}, ..., \textbf{v}^{\left( n \right)}$.
+
+Al aplicar el método de potencia a $\left( A - qI \right)^{-1}$ da
+\begin{equation*}
+\textbf{y}^{\left( m \right)} = \left( A - qI \right)^{-1} \textbf{x}^{\left( m - 1 \right)},
+\end{equation*}
+\begin{equation}
+\mu^{\left( m \right)} = \text{y}_{p_{\left( m - 1 \right)}}^{\left( m \right)} = \frac{\text{y}_{p_{\left( m - 1 \right)}}^{\left( m \right)}}{\text{x}_{p_{\left( m - 1 \right)}}^{\left( m - 1 \right)}} = \frac{\sum_{j=1}^{n} \beta_{j} \frac{1}{\left( \lambda_{j} - q \right)^{m}} v_{p_{m}}^{\left( j \right)}}{\sum_{j=1}^{n} \beta_{j} \frac{1}{\left( \lambda_{j} - q \right)^{m-1}} v_{p_{m}}^{\left( j \right)}},
+\end{equation}
+y
+\begin{equation*}
+\textbf{x}^{\left( m \right)} = \frac{\textbf{y}^{\left( m \right)}}{\text{y}_{p_{m}}^{\left( m \right)}},
+\end{equation*}
+donde, en cada paso, $p_{m}$ representa el entero más pequeño para el que $\left| \text{y}_{p_{m}}^{\left( m \right)} \right| = \left\| \textbf{y}^{\left( m \right)} \right\|_{\infty }$. La sucesión $\left\{ \mu^{\left( m \right)} \right\}$ en la ecuación (8) converge en $1 / \left( \lambda_{k} - q \right)$, donde
+\begin{equation*}
+\frac{1}{\left| \lambda_{k} - q \right|} =\max_{1\le i\le n} \frac{1}{\left| \lambda_{i} - q \right|}
+\end{equation*}
+y $\lambda_{k} \approx q + 1 / \mu^{\left( m \right)}$ es el autovalor de $A$ más cercano a $q$.
+
+Conociendo $k$, la ecuación (8) se puede escribir como
+\begin{equation}
+\mu^{\left( m \right)} = \frac{1}{\lambda_{k} - q} \left[ \frac{\beta_{k} v_{p_{\left( m - 1 \right)}}^{\left( k \right)} + 
+\sum_{j=1, j\neq k}^{n} \beta_{j} \left[ \frac{\lambda_{k} - q}{\lambda_{j} - q} \right]^{m} v_{p_{\left( m - 1 \right)}}^{\left( j \right)}}{\beta_{k} v_{p_{\left( m - 1 \right)}}^{\left( k \right)} + 
+\sum_{j=1, j\neq k}^{n} \beta_{j} \left[ \frac{\lambda_{k} - q}{\lambda_{j} - q} \right]^{m-1} v_{p_{\left( m - 1 \right)}}^{\left( j \right)}} \right].
+\end{equation}
+Por lo tanto, la selección de $q$ determina la convergencia, siempre y cuando $1 / \left( \lambda_{k} - q \right)$ sea un único autovalor dominante de $\left( A - qI \right)^{-1}$ (a pesar de que puede ser un autovalor múltiple). Mientras $q$ está más cerca de un autovalor $\lambda_{k}$, más rápida será la convergencia ya que la convergencia es de orden
+\begin{equation*}
+O\left( \left| \frac{\left( \lambda - q \right)^{-1}}{\left( \lambda_{k} - q \right)^{-1}} \right|^{m} \right) = O \left( \left| \frac{\left( \lambda_{k} - q \right)}{\left( \lambda - q \right)} \right|^{m} \right),
+\end{equation*}
+donde $\lambda$ representa el autovalor de $A$ que es el segundo más cercano a $q$.
+
+El vector $\text{y}^{\left( m \right)}$ se obtiene al resolver el sistema lineal
+\begin{equation*}
+\left( A - qI \right) \textbf{y}^{\left( m \right)} = \textbf{x}^{\left( m - 1 \right)}.
+\end{equation*}
+En general, se usa la eliminación gaussiana con pivoteo pero, como en el caso de la factorización LU, los multiplicadores se pueden guardar para reducir el cálculo. La selección de $q$ puede basarse en el teorema del círculo de Geršgorin o en otros medios de localización de un autovalor.
+
+\subsubsection*{Ejemplo 3} % modificado Ejemplo 4
+
+    Aplique el método de potencia inversa con $x^{(0)} = (1, 1, 1)^t$ a la matriz
+
+    $$A =\begin{bmatrix}
+        -4 & 14 & 0 \\
+        -5 & 13 & 0 \\
+        -1 & 0 & 2 \\
+    \end{bmatrix} \;\;\; con \;\;\; q = \frac{(x^{(0)})^t Ax^{(0)}}{(x^{(0)})^tx^{(0)}} = \frac{19}{3}$$
+
+    y use el método $\Delta^2$ de Aitkens para acelerar la convergencia.
+
+    {\bf Solución.}
+
+    El método de potencia se aplicó a esta matriz en el ejemplo 1 usando el vector in inicial $x^{(0)} = (1,1,1)^t.$ Éste nos dio el eigenvalor $\mu^{(12)} = 6.000837$ y el eigenvector $(x^{(12)})^t = (1, 0.714316, -0.249895)^t$.
+
+    Para el método de potencia inversa, consideramos
+
+    $$A - qI =\begin{bmatrix}
+        -31/3 & 14 & 0 \\
+        -5 & 20/3 & 0 \\
+        -1 & 0 & -13/3 \\
+    \end{bmatrix}$$
+
+    Con $x^(0) = (1, 1, 1)^t$, el método encuentra primero y^{(1)} al resolver (A- qI)y^{(1)} = x^(0). Esto da
+
+    $$y^{(1)} = (-\frac{33}{5},-\frac{24}{5},\frac{84}{65})^t = (-6.6,-4.8, 1.292307692)^t.$$
+
+    Por lo que
+
+    $$\left\|y^{(1)}\right\|_{\infty} = 6.6, x^{(1)} = \frac{1}{-6.6}y^{(1)} = (1, 0.7272727,-0.1958042)^t,$$
+
+    $$μ^{(1)} = -\frac{1}{6.6} + \frac{19}{3} = 6.1818182.$$
+
+    Los resultados subsiguientes se incluyen en la tabla \ref{tab:ej222} y la columna derecha lista de resultados del método $\Delta^2$ de Aitkens aplicado a $\mu^{(m)}$. Estos son resultados claramente superiores a los obtenidos con el método de potencia.
+
+    \begin{table}[h!]
+        \centering
+        \caption{aproximación de eigenvalor en el ejemplo 1}
+        \label{tab:ej222}
+        \begin{tabular}{|cccc|} \hline
+            $m$ & $(x^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ \hline
+            0  &  (1, 1, 1)  & & \\
+            1  &  (1, 0.7272727, -0.1958042)  &  6.1818182 & 6.000098 \\
+            2  &  (1, 0.7155172, -0.2450520)  &  6.0172414 & 6.000001 \\
+            3  &  (1, 0.7144082, -0.2495224)  &  6.0017153 & 6.000000 \\
+            4  &  (1, 0.7142980, -0.2499534)  &  6.0001714 & 6.000000 \\
+            5  &  (1, 0.7142869, -0.2499954)  &  6.0000171 & \\
+            6  &  (1, 0.7142858, -0.2499996)  &  6.0000017 & \\
+        \end{tabular}
+    \end{table}
+
+    Si $A$ es simétrica, entonces, para cualquier número real $q$, la matriz $(A-q I)^{-1}$ también es simétrica; por lo que el método de potencia simétrica, se puede aplicar $(A-q I)^{-1}$ para acelerar la convergencia en
+
+    $$O\left( \left|\frac{\lambda_k - q}{\lambda - q}\right|^{2m} \right)$$
+
+\end{document}

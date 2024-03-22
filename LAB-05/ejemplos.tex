@@ -1,0 +1,454 @@
+\documentclass{report}
+\renewcommand{\familydefault}{\sfdefault} % Cambia la fuente a sans serif
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage[a4paper, margin=2.54cm]{geometry}
+\usepackage{helvet} % Fuente sans serif
+\usepackage{indentfirst} % Agrega una sangría a los párrafos que siguen a los títulos de las secciones
+\usepackage[none]{hyphenat} % Desactiva todos los guiones
+\usepackage{amssymb} % Para representar los números complejos
+\usepackage{amsmath} % El paquete amsmath es por las ecuaciones
+\usepackage{setspace} % Para poder establecer un terlineado doble
+\pagestyle{fancy}
+\fancyhf{} % Limpia los encabezados y pies de página existentes
+\rhead{\thepage} % Coloca el número de página en la esquina superior derecha
+\renewcommand{\headrulewidth}{0pt} % Elimina la línea horizontal
+\numberwithin{subsection}{section} % Reconteo de las subsecciones dentro de las secciones
+\renewcommand\thesection{\arabic{section}} % Modifica la numeración de las secciones
+\setlength{\parindent}{1.27cm} % Establece la longitud de la sangría en 1.27 cm
+
+\begin{document}
+
+
+\subsubsection*{Ejemplo 2}
+        
+\begin{itemize}
+    \item Muestre que ${\bf v}^{(1)} = (1,0,0)^t$, ${\bf v}^{(2)} = (-1,1,1)^t$, ${\bf v}^{(3)} = (0,4,2)^t$ es una base para $\mathbb{R}^3$, y
+    \item dado un vector arbitrario ${\bf x} \in \mathbb{R}^3$, encuentre $\beta_1$, $\beta_2$ y $\beta_3$ con
+    $${\bf x} = \beta_1{\bf v}^{(1)} + \beta_2{\bf v}^{(2)} + \beta_3{\bf v}^{(3)}$$
+\end{itemize}
+
+{\bf Solución.}
+
+\begin{itemize}
+
+    \item Sean $\alpha_1$, $\alpha_2$ y $\alpha_3$ números con ${\bf 0} = \alpha_1{\bf v}^{(1)} + \alpha_2{\bf v}^{(2)} + \alpha_3{\bf v}^{(3)}$
+    
+    \begin{align*}
+        (0,0,0)^t & = \alpha_1(1,0,0)^t + \alpha_2(-1,1,1)^t + \alpha_3(0,4,2)^t \\
+        & = (\alpha_1 - \alpha_2, \alpha_2 + 4\alpha_3, \alpha_2 + 2\alpha_3)^t
+    \end{align*}
+
+    por lo que $\alpha_1 - \alpha_2 = 0$, $\alpha_2 + 4\alpha_3 = 0$, y $\alpha_2 + 2\alpha_3 = 0$
+
+    La única solución para este sistema es $\alpha_1 = \alpha_2 = \alpha_3 = 0$, por lo que este conjunto $\{v^{(1)}, v^{(2)}, v^{(3)}\}$ de tres vectores linealmente independientes en $\mathbb{R}^3$ es una base para $\mathbb{R}^3$.
+
+    \item Sea ${\bf x} = (x_1, x_2, x_3)^t$ un vector en $\mathbb{R}^3$. Resolviendo
+    
+    \begin{align*}
+        {\bf x} & = \beta_1{\bf v}^{(1)} + \beta_2{\bf v}^{(2)} + \beta_3{\bf v}^{(3)} \\
+                & = \beta_1(1,0,0)^t + \beta_2(-1,1,1)^t + \beta_3(0,4,2)^t \\
+                & = (\beta_1 - \beta_2, \beta_2 + 4\beta_3, \beta_2 + 2\beta_3)^t
+    \end{align*}
+
+    es equivalente a resolver para $\beta_1$, $\beta_2$ y $\beta_3$ en el sistema
+
+    $$\beta_1 - \beta_2 = 0, \; \beta_2 + 4\beta_3 = 0, \; \beta_2 + 2\beta_3 = 0$$
+
+    Este sistema tiene la solución única
+
+    $$\beta_1 = x_1 - x_2 + 2x_3, \; \beta_2 = 2x_3 - x_2, \; \beta_3 = {1 \over 2}(x_2 - x_3).$$
+    
+\end{itemize}
+
+\subsubsection*{Ejemplo 3}
+        
+        Muestre que se puede formar una base para $\mathbb{R}^3$ usando los eigenvectores de la matriz 3 \times 3
+    
+        \begin{equation*}
+            A =\begin{bmatrix}
+            2 & 0 & 0 \\
+            1 & 1 & 2 \\
+            1 & -1 & 4
+            \end{bmatrix}
+        \end{equation*}
+    
+        {\bf Solución.}
+    
+        El polinomio característico de $A$ es
+    
+        \begin{align*}
+            p(\lambda) &= det(A - \lambda I) = det\begin{bmatrix}
+                                                    2 & 0 & 0 \\
+                                                    1 & 1 & 2 \\
+                                                    1 & -1 & 4
+                                                    \end{bmatrix} \\
+            &= -(\lambda^3 - 7\lambda^2 + 16\lambda  - 12) = -(\lambda  - 3)(\lambda  - 2)^2,
+        \end{align*}
+    
+        por lo que existen dos eigenvalores de $A: \lambda_1 = 3$ y $\lambda_2 = 2$.
+    
+        Un eigenvector $x_1$ correspondiente al eigenvalor $\lambda_1 = 3$ es una solución para la ecuación de vector-matriz $(A - 3 · I )x_1 = 0$, por lo que \\
+    
+        \begin{array}{ccccc}
+            \begin{bmatrix}
+                0 \\ 0 \\ 0
+            \end{bmatrix} &=&
+            \begin{bmatrix}
+                -1 & 0 & 0 \\
+                1 & -2 & 2 \\
+                1 & -1 & 1
+            \end{bmatrix} & \cdot &
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix}
+        \end{array} \\
+    
+        lo cual implica que $x_1 = 0$ y $x_2$ = $x_3$.
+    
+        Cualquier valor diferente de cero de $x_3$ produce un eigenvector para el eigenvalor $\lambda_1 = 3$. Por ejemplo cuando $x_3 = 1$, tenemos el eigenvector $x_1 = (0, 1, 1)^t$, y cualquier eigenvector de $A$ correspondiente a $\lambda = 3$ es un múltiplo diferente a cero de $x_1$.
+        
+        Un eigenvector $x = 0$ de A asociado con $\lambda_2 = 2$ es una solución del sistema $(A - 2 · I )x = 0$, por lo que \\
+    
+        \begin{array}{ccccc}
+            \begin{bmatrix}
+                0 \\ 0 \\ 0
+            \end{bmatrix} &=&
+            \begin{bmatrix}
+                0 & 0 & 0 \\
+                1 & -1 & 2 \\
+                1 & -1 & 2
+            \end{bmatrix} & \cdot &
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix}
+        \end{array} \\
+    
+        En este caso, el eigenvector sólo tiene que satisfacer la ecuación
+    
+        $$x_1 - x_2 + 2x_3 = 0,$$
+    
+        lo cual se puede realizar de diferentes formas. Por ejemplo, cuando $x_1 = 0$, tenemos $x_2 = 2x_3$, por lo que una elección sería $x_2 = (0, 2, 1)^t$. También podríamos seleccionar $x_2 = 0$, lo cual requiere que $x_1 = -2x_3$. Por lo tanto, $x_3 = (-2, 0, 1)^t$ da un segundo eigenvector para el eigenvalor $\lambda_2 = 2$ que no es un múltiplo de $x_2$. Los eigenvectores de A correspondientes al eigenvalor $\lambda_2 = 2$ generan un plano entero. Este plano se describe mediante todos los vectores de la forma
+    
+        $$\alpha x_2 + βx_3 = (-2\beta, 2\alpha , \alpha  + \beta)^t$$
+    
+        para constantes arbitrarias $\alpha$ y $\beta$, siempre y cuando al menos una de las constantes sea diferente de cero.
+    
+        En este ejemplo encontramos que $\lambda_1 = 3$ tiene el eigenvector $x_1 = (0, 1, 1)^t$ y que hay dos eigenvectores linealmente independientes $x_2 = (0, 2, 1)^t$ y $x_3 = (-2, 0, 1)^t$ correspondientes a $\lambda_2 = 2$.
+    
+        $$\{ x_1, x_2, x_3\} = \{(0, 1, 1)^t, (0, 2, 1)^t, (-2, 0, 1)^t \}$$
+    
+        es linealmente independiente y, por lo tanto, forma una base para $\mathbb{R}^3$.
+        
+\subsubsection*{Ejemplo 4}
+        
+        Muestre que ningún conjunto de eigenvectores de la matriz $3 \times 3$
+    
+        $$B = \begin{bmatrix}
+            2 & 1 & 0 \\
+            0 & 2 & 0 \\
+            0 & 0 & 3
+        \end{bmatrix}$$
+    
+        puede formar una base para $\mathbb{R}^3$.
+    
+        {\bf Solución.}
+    
+        Esta matriz también tiene el mismo polinomio característico que la matriz A en el ejemplo 3.
+    
+        $$p(\lambda) = det\begin{bmatrix}
+                            2-\lambda & 1 & 0 \\
+                            0 & 2-\lambda & 0 \\
+                            0 & 0 & 3-\lambda
+                        \end{bmatrix} = (\lambda  - 3)(\lambda  - 2)^2,$$
+    
+        por lo que sus eigenvalores son iguales a los de A en el ejemplo 3, es decir, $\lambda_1 = 3$ y $\lambda_2 = 2$.
+        
+        Para determinar los eigenvectores para B correspondientes al eigenvalor $\lambda_1 = 3$, necesitamos
+        resolver el sistema $(B - 3\cdot I)x = 0$, por lo que
+    
+        \begin{equation*}
+            \begin{bmatrix}
+                0 \\ 0 \\ 0
+            \end{bmatrix} = (B - 3I)
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix} =
+            \begin{bmatrix}
+                -1 & 0 & 0 \\
+                1 & -2 & 2 \\
+                1 & -1 & 1
+            \end{bmatrix}  \cdot 
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix} =
+            \begin{bmatrix}
+                -x_1 + x_2 \\ -x_2 \\ 0
+            \end{bmatrix}
+        \end{equation*}
+    
+        Por lo tanto, $x_2 = 0$, $x_1 = x_2 = 0$ y $x_3$ es arbitrario. Haciendo $x_3 = 1$ esto nos da el único eigenvector linealmente independiente $(0, 0, 1)^t$ correspondiente a $\lambda_1 = 3$.
+    
+        Considerando $\lambda_2 = 2$. Si
+    
+        \begin{equation*}
+            \begin{bmatrix}
+                0 \\ 0 \\ 0
+            \end{bmatrix} = (B - 2I)
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix} =
+            \begin{bmatrix}
+                0 & 1 & 0 \\
+                0 & 0 & 0 \\
+                0 & 0 & 1
+            \end{bmatrix}  \cdot 
+            \begin{bmatrix}
+                x_1 \\ x_2 \\ x_3
+            \end{bmatrix} =
+            \begin{bmatrix}
+                x_2 \\ 0 \\ x_3
+            \end{bmatrix}
+        \end{equation*}
+        
+        entonces $x_2 = 0$, $x_3 = 0$, y $x_1$ es arbitrario. Existe sólo un eigenvector linealmente independiente que corresponde a $\lambda_2 = 2$, lo que se puede expresar como $(1, 0, 0)^t$, aun cuando $\lambda_2 = 2$ fue un cero de multiplicidad dos del polinomio característico de B.
+    
+        Es claro que estos dos eigenvectores no son suficientes para formar una base en $\mathbb{R}^3$. En particular, $(0, 1, 0)^t$ no es una combinación lineal de $\{(0, 0, 1)^t, (1, 0, 0)^t\}$.
+        
+\subsubsection*{Ejemplo 5}
+
+\begin{itemize}
+    \item Muestre que los vectores $v^{(1)} = (0, 4, 2)^t$, $v^{(2)} = (-5,-1, 2)^t$ y $v^{(3)} = (1,-1, 2)^t$ forman un conjunto ortogonal y
+    \item Úselos para determinar un conjunto de vectores ortonormales.
+\end{itemize}
+
+{\bf Solución.}
+
+\begin{itemize}
+    \item Tenemos $(v^{(1)})^t v(2) = 0(-5) + 4(-1) + 2(2) = 0$,
+    
+    $$(v^{(1)})^t v^{(3)} = 0(1) + 4(-1) + 2(2) = 0, \; y \; (v^{(2)})^t v^{(3)} = -5(1) - 1(-1) + 2(2) = 0,$$
+
+    por lo que los vectores son ortogonales y forman una base para $\mathbb{R}^n$. Las normas $l_2$ de estos vectores son
+
+    $$\left\| \textbf{v}^{(1)} \right\|_{2} = 2\sqrt{5}, \; \left\| \textbf{v}^{(2)} \right\|_{2} = \sqrt{30}, \; \left\| \textbf{v}^{(3)} \right\|_{2} = \sqrt{6}$$
+
+    \item Los vectores
+    
+    $\textbf{u}^{(1)} = \frac{ \textbf{v}^{(1)} }{\left\| \textbf{v}^{(1)} \right\|_{2}} = \left( \frac{0}{2\sqrt{5}}, \frac{4}{2\sqrt{5}}, \frac{2}{2\sqrt{5}}\right)^t = \left( 0, \frac{2\sqrt{5}}{5}, \frac{\sqrt{5}}{5}\right)^t$
+    
+    \begin{equation*}
+        \begin{split}
+            \textbf{u}^{(1)} &= \frac{ \textbf{v}^{(1)} }{\left\| \textbf{v}^{(1)} \right\|_{2}} = \left( \frac{0}{2\sqrt{5}}, \frac{4}{2\sqrt{5}}, \frac{2}{2\sqrt{5}}\right)^t = \left( 0, \frac{2\sqrt{5}}{5}, \frac{\sqrt{5}}{5}\right)^t \\
+
+            \textbf{u}^{(2)} &= \frac{ \textbf{v}^{(2)} }{\left\| \textbf{v}^{(2)} \right\|_{2}} = \left( \frac{-5}{\sqrt{30}}, \frac{-1}{\sqrt{30}}, \frac{2}{\sqrt{30}}\right)^t = \left( -\frac{\sqrt{30}}{6}, -\frac{\sqrt{30}}{30}, \frac{\sqrt{30}}{15}\right)^t \\
+    
+            \textbf{u}^{(3)} &= \frac{ \textbf{v}^{(3)} }{\left\| \textbf{v}^{(3)} \right\|_{2}} = \left( \frac{1}{\sqrt{6}}, \frac{-1}{\sqrt{6}}, \frac{2}{\sqrt{6}}\right)^t = \left( \frac{\sqrt{6}}{6}, -\frac{\sqrt{6}}{6}, \frac{\sqrt{6}}{3}\right)^t \\
+        \end{split}
+    \end{equation*}
+    
+    forman un conjunto ortonormal ya que heredan la ortogonalidad a partir de $v^{(1)}$, $v^{(2)}$, y $v^{(3)}$. Además,
+
+    $$\left\| \textbf{u}^{(1)} \right\| = \left\| \textbf{u}^{(2)} \right\| = \left\| \textbf{u}^{(3)} \right\| = 1$$ 
+\end{itemize}
+        
+\subsubsection*{Ejemplo 6}
+        
+Use el proceso de Gram-Schmidt para determinar un conjunto de vectores ortogonales a partir de los vectores linealmente independientes:
+
+$$x^{(1)} = (1, 0, 0)^t, \; x^{(2)} = (1, 1, 0)^t, \; x^{(3)} = (1, 1, 1)^t.$$
+
+{\bf Solución.}
+
+Tenemos los vectores ortogonales $v^{(1)}$, $v^{(2)}$ y $v^{(3)}$, dados por
+
+\begin{align*}
+    v^{(1)} &= x^{(1)} = (1, 0, 0)^t \\
+    v^{(2)} &= (1, 1, 0)^t - \left(\frac{((1, 0, 0)^t)^t (1, 1, 0)^t}{((1, 0, 0)^t)^t (1, 0, 0)^t}\right) (1, 0, 0)^t = (1, 1, 0)^t - (1, 0, 0)^t = (0, 1, 0)^t \\
+    v^{(3)} &= (1, 1, 1)^t - \left(\frac{((1, 0, 0)^t)^t (1, 1, 1)^t}{((1, 0, 0)^t)^t (1, 0, 0)^t}\right)(1, 0, 0)^t - \left(\frac{((0, 1, 0)^t)^t (1, 1, 1)^t}{((0, 1, 0)^t)^t (0, 1, 0)^t}\right)(0, 1, 0)^t \\
+    &= (1, 1, 1)^t - (1, 0, 0)^t - (0, 1, 0)^t = (0, 0, 1)^t.
+\end{align*}
+
+El conjunto $\{v^{(1)}, v^{(2)}, v^{(3)}\}$ resulta ser tanto ortonormal, como ortogonal, pero comúnmente, ésta no es la situación.
+
+
+
+
+\subsubsection*{Ejemplo 1} % modificado Ejemplo 2
+        
+    Use el método de potencia para aproximar el eigenvalor dominante de la matriz
+
+    $$A =\begin{bmatrix}
+        -4 & 14 & 0 \\
+        -5 & 13 & 0 \\
+        -1 & 0 & 2 \\
+    \end{bmatrix}$$
+
+    y, a continuación, aplique el método $\Delta^2$ de Aitkens para las aproximaciones para el eigenvalor de la matriz para acelerar la convergencia.
+
+    {\bf Solución.}
+
+    Esta matriz tiene eigenvalores $\lambda_1 = 6$, $\lambda_2 = 3$, y $\lambda_3 = 2$, por lo que el método de potencia convergerán $x^{(0)} = (1, 1, 1)^t$ , entonces
+
+    $$y^{(1)} = Ax^{(0)} = (10, 8, 1)^t,$$
+
+    por lo que
+
+    $$\left\|y^{(1)}\right\|_{\infty} = 10, \;\; \mu^{(1)} = y_1^{(1)} = 10, \;\; x^{(1)} = {y^{(1)} \over 10} = (1, 0.8, 0.1)^t.$$
+
+    Al continuar de esta forma llegamos a los valores en la tabla \ref{tab:ej1} $\hat{\mu}^{(m)}$ representa la sucesión generada por el procedimiento $\Delta^2$ de Aitkens. Una aproximación para el eigenvalor
+
+    \begin{table}[h!]
+        \centering
+        \caption{aproximación de eigenvalor en el ejemplo 1}
+        \label{tab:ej1}
+        \begin{tabular}{|cccc|} \hline
+            $m$ & $(x^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ \\ \hline
+            0  &  (1, 1, 1)  & & \\
+            1  &  (1, 0.8, 0.1)  &  10 & 6.266667 \\
+            2  &  (1, 0.75, -0.111)  &  7.2 & 6.062473 \\
+            3  &  (1, 0.730769, -0.188803)  &  6.5 & 6.015054 \\
+            4  &  (1, 0.722200, -0.220850)  &  6.230769 & 6.004202 \\
+            5  &  (1, 0.718182, -0.235915)  &  6.111000 & 6.000855  \\
+            6  &  (1, 0.716216, -0.243095)  &  6.054546 & 6.000240 \\
+            7  &  (1, 0.715247, -0.246588)  &  6.027027 & 6.000058  \\
+            8  &  (1, 0.714765, -0.248306)  &  6.013453 & 6.000017  \\
+            9  &  (1, 0.714525, -0.249157)  &  6.006711 & 6.000003  \\
+            10  &  (1, 0.714405, -0.249579)  &  6.003352 & 6.000000 \\
+            11  &  (1, 0.714346, -0.249790)  &  6.001675 & \\
+            12  &  (1, 0.714316, -0.249895)  &  6.000837 & \\ \hline
+        \end{tabular}
+    \end{table}
+
+    dominante 6, en esta etapa es $\hat{\mu}^{(10)} = 6.000000$. El eigenvector unitario $l_{\infty^-}$ aproximado para el eigenvalor 6 es $(x^{(12)})^t = (1, 0.714316,-0.249895)^t.$
+    
+    Aunque la aproximación para el eigenvalor es correcta para los lugares enumerados, la aproximación del eigenvector es considerablemente menos precisa para el eigenvector verdadero $(1, 5/7, -1/4)^t  \approx (1, 0.714286, -0.25)^t.$
+        
+\subsubsection*{Ejemplo 2} % modificado Ejemplo 3
+        
+    Aplique tanto el método de potencia como el de potencia simétrica a la matriz
+
+    $$A =\begin{bmatrix}
+        4 & -1 & 1 \\
+        -1 & 3 & -2 \\
+        1 & -2 & 3 \\
+    \end{bmatrix}$$
+
+    usando el método $\Delta^2$ de Aitkens para acelerar la convergencia.
+
+    {\bf Solución.}
+
+    Esta matriz tiene eigenvalores $\lambda_1 = 6$, $\lambda_2 = 3$ y $\lambda_3 = 1$. Un eigenvector para el eigenvector 6 es $(1,-1, 1)^t$. La aplicación del método de potencia a esta matriz con vector inicial $(1, 0, 0)^t$ de los valores de la tabla \ref{tab:ej2}
+
+    \begin{table}[h!]
+        \centering
+        \caption{aproximación de eigenvalor en el ejemplo 2}
+        \label{tab:ej2}
+        \begin{tabular}{|ccccc|} \hline
+            $m$ & $(y^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ & $(x^{(m)})^t$ con $\left\|x^{(m)}\right\|_{\infty} = 1$ \\ \hline
+            0  &                                   &            &           &  (1, 0, 0) \\
+            1  &  (4, -1, 1)                       &  4         &           &  (1, -0.25, 0.25) \\
+            2  &  (4.5, -2.25, 2.25)               &  4.5       & 7         &  (1, -0.5, 0.5) \\
+            3  &  (5, -3.5, 3.5)                   &  5         & 6.2       &  (1, -0.7, 0.7) \\
+            4  &  (5.4, -4.5, 4.5)                 &  5.4       & 6.047617  &  (1, -0.8333¯ , 0.8333) \\
+            5  &  (5.66¯6, -5.166¯6, 5.166¯6)      &  5.666     & 6.011767  &  (1, -0.911765, 0.911765) \\
+            6  &  (5.823529, -5.558824, 5.558824)  &  5.823529  & 6.002931  &  (1, -0.954545, 0.954545) \\
+            7  &  (5.909091, -5.772727, 5.772727)  &  5.909091  & 6.000733  &  (1, -0.976923, 0.976923) \\
+            8  &  (5.953846, -5.884615, 5.884615)  &  5.953846  & 6.000184  &  (1, -0.988372, 0.988372) \\
+            9  &  (5.976744, -5.941861, 5.941861)  &  5.976744  &           &  (1, -0.994163, 0.994163) \\
+            10 &  (5.988327, -5.970817, 5.970817)  &  5.988327  &           &  (1, -0.997076, 0.997076) \\ \hline
+        \end{tabular}
+    \end{table}
+
+    Ahora aplicaremos el método de potencia simétrica a esta matriz con el mismo vector inicial $(1, 0, 0)^t$. Los primeros pasos son
+
+    $$x^{(0)} = (1, 0, 0)^t , \;\; Ax^{(0)} = (4,.1, 1)^t , \;\; M^{(1)} = 4,$$
+
+    y
+
+    $$x^{(1)} = \frac{1}{\left\|Ax^{(0)}\right\|_2}· Ax^{(0)} = (0.942809,-0.235702, 0.235702]^t.$$
+
+    Las entradas restantes se muestran en la tabla \ref{tab:ej22}
+
+    \begin{table}[h!]
+        \centering
+        \caption{entradas restantes en el ejemplo 2}
+        \label{tab:ej22}
+        \begin{tabular}{|ccccc|} \hline
+            $m$ & $(y^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ & $(x^{(m)})^t$ con $\left\|x^{(m)}\right\|_{2} = 1$ \\ \hline
+            0  &  (1, 0, 0) & & & (1, 0, 0)  \\
+            1  &  (4, 1, 1)                       &  4         & 7          &(0.942809, 0.235702, 0.235702) \\
+            2  &  (4.242641, 2.121320, 2.121320)  &  5         &  6.047619  &(0.816497, 0.408248, 0.408248) \\
+            3  &  (4.082483, 2.857738, 2.857738)  &  5.666667  &  6.002932  &(0.710669, 0.497468, 0.497468) \\
+            4  &  (3.837613, 3.198011, 3.198011)  &  5.909091  &  6.000183  &(0.646997, 0.539164, 0.539164) \\
+            5  &  (3.666314, 3.342816, 3.342816)  &  5.976744  &  6.000012  &(0.612836, 0.558763, 0.558763) \\
+            6  &  (3.568871, 3.406650, 3.406650)  &  5.994152  &  6.000000  &(0.595247, 0.568190, 0.568190) \\
+            7  &  (3.517370, 3.436200, 3.436200)  &  5.998536  &  6.000000  &(0.586336, 0.572805, 0.572805) \\
+            8  &  (3.490952, 3.450359, 3.450359)  &  5.999634  &            &(0.581852, 0.575086, 0.575086) \\
+            9  &  (3.477580, 3.457283, 3.457283)  &  5.999908  &            &(0.579603, 0.576220, 0.576220) \\
+            10 &  (3.470854, 3.460706, 3.460706)  &  5.999977  &            &(0.578477, 0.576786, 0.576786) \\ \hline
+        \end{tabular}
+    \end{table}
+
+    El método de potencia simétrica da una convergencia considerablemente más rápida para esta matriz que el método de potencia. Las aproximaciones del eigenvector en el método de potencia converge en $(1,-1, 1)^t$, un vector con norma unitaria en $l_{\infty}$. En el método de potencia simétrica, la convergencia es el vector paralelo $(\sqrt{3}/3, -\sqrt{3}/3, \sqrt{3}/3)^t$, que tiene la norma unitaria en $l_2$.
+
+Si $\lambda$ es un número real que aproxima un autovalor de una matriz simétrica $A$ y $\textbf{x}$ es un autovector asociado aproximado, entonces $A\textbf{x} - \lambda\textbf{x}$ es aproximadamente el vector cero. El siguiente teorema relaciona la norma de este vector para la precisión del autovalor $\lambda$
+
+\subsubsection*{Ejemplo 3} % modificado Ejemplo 4
+        
+Aplique el método de potencia inversa con $x^{(0)} = (1, 1, 1)^t$ a la matriz
+
+$$A =\begin{bmatrix}
+    -4 & 14 & 0 \\
+    -5 & 13 & 0 \\
+    -1 & 0 & 2 \\
+\end{bmatrix} \;\;\; con \;\;\; q = \frac{(x^{(0)})^t Ax^{(0)}}{(x^{(0)})^tx^{(0)}} = \frac{19}{3}$$
+
+y use el método $\Delta^2$ de Aitkens para acelerar la convergencia.
+
+{\bf Solución.}
+
+El método de potencia se aplicó a esta matriz en el ejemplo 1 usando el vector in inicial $x^{(0)} = (1,1,1)^t.$ Éste nos dio el eigenvalor $\mu^{(12)} = 6.000837$ y el eigenvector $(x^{(12)})^t = (1, 0.714316, -0.249895)^t$.
+
+Para el método de potencia inversa, consideramos
+
+$$A - qI =\begin{bmatrix}
+    -31/3 & 14 & 0 \\
+    -5 & 20/3 & 0 \\
+    -1 & 0 & -13/3 \\
+\end{bmatrix}$$
+
+Con $x^(0) = (1, 1, 1)^t$, el método encuentra primero $y^{(1)}$ al resolver $(A- qI)y^{(1)} = x^(0)$. Esto da
+
+$$y^{(1)} = (-\frac{33}{5},-\frac{24}{5},\frac{84}{65})^t = (-6.6,-4.8, 1.292307692)^t.$$
+
+Por lo que
+
+$$\left\|y^{(1)}\right\|_{\infty} = 6.6, x^{(1)} = \frac{1}{-6.6}y^{(1)} = (1, 0.7272727,-0.1958042)^t,$$
+
+$$μ^{(1)} = -\frac{1}{6.6} + \frac{19}{3} = 6.1818182.$$
+
+Los resultados subsiguientes se incluyen en la tabla \ref{tab:ej222} y la columna derecha lista de resultados del método $\Delta^2$ de Aitkens aplicado a $\mu^{(m)}$. Estos son resultados claramente superiores a los obtenidos con el método de potencia.
+
+\begin{table}[h!]
+    \centering
+    \caption{aproximación de eigenvalor en el ejemplo 1}
+    \label{tab:ej222}
+    \begin{tabular}{|cccc|} \hline
+        $m$ & $(x^{(m)})^t$ & $\mu^{(m)}$ & $\hat{\mu}^{(m)}$ \\ \hline
+        0  &  (1, 1, 1)  & & \\
+        1  &  (1, 0.7272727, -0.1958042)  &  6.1818182 & 6.000098 \\
+        2  &  (1, 0.7155172, -0.2450520)  &  6.0172414 & 6.000001 \\
+        3  &  (1, 0.7144082, -0.2495224)  &  6.0017153 & 6.000000 \\
+        4  &  (1, 0.7142980, -0.2499534)  &  6.0001714 & 6.000000 \\
+        5  &  (1, 0.7142869, -0.2499954)  &  6.0000171 & \\
+        6  &  (1, 0.7142858, -0.2499996)  &  6.0000017 & \\ \hline
+    \end{tabular}
+\end{table}
+
+Si $A$ es simétrica, entonces, para cualquier número real $q$, la matriz $(A-q I)^{-1}$ también es simétrica; por lo que el método de potencia simétrica, se puede aplicar $(A-q I)^{-1}$ para acelerar la convergencia en
+
+$$O\left( \left|\frac{\lambda_k - q}{\lambda - q}\right|^{2m} \right)$$   
+
+
+\end{document}
